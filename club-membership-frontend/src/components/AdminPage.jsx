@@ -1,0 +1,248 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+export default function AdminPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("adminToken");
+
+  const authHeader = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  const fetchUsers = async () => {
+    if (!token) {
+      navigate("/admin-login");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError("");
+      const res = await axios.get(
+        "https://membership-brown.vercel.app/api/admin/pending-users",
+        authHeader
+      );
+      setUsers(res.data.users || []);
+    } catch (err) {
+      console.error("Fetch users error:", err.response?.data);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem("adminToken");
+        setUsers([]);
+        navigate("/admin-login");
+      } else {
+        setError(err.response?.data?.message || "Error fetching users");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openWhatsApp = (user) => {
+    const message = `
+Membership Approved ✅
+
+Name: ${user.name}
+Nickname: ${user.nickname}
+Membership ID: ${user.membershipId || "Will be generated"}
+Phone: ${user.phone}
+Blood Group: ${user.bloodGroup}
+DOB: ${user.dob}
+Valid Upto: ${user.expiryDate}
+
+Welcome to the club 🎉
+    `;
+
+    const encodedMessage = encodeURIComponent(message);
+    const phone = user.phone.replace(/\D/g, "");
+
+    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, "_blank");
+  };
+
+  const approveUser = async (user) => {
+    try {
+      setActionLoading(user);
+      setError("");
+      const res = await axios.put(
+        `https://membership-brown.vercel.app/api/admin/approve/${user}`,
+        {},
+        authHeader
+      );
+      alert(`User approved! Membership ID: ${res.data.user.membershipId}`);
+      fetchUsers();
+    } catch (err) {
+      console.error("Approve error:", err.response?.data);
+      setError(err.response?.data?.message || "Error approving user");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const rejectUser = async (user) => {
+    try {
+      setActionLoading(user);
+      setError("");
+      await axios.put(
+        `https://membership-brown.vercel.app/api/admin/reject/${user}`,
+        {},
+        authHeader
+      );
+      fetchUsers();
+    } catch (err) {
+      console.error("Reject error:", err.response?.data);
+      setError(err.response?.data?.message || "Error rejecting user");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    navigate("/admin-login");
+  };
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/admin-login");
+      return;
+    }
+    fetchUsers();
+  }, [token, navigate]);
+
+  return (
+    <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col flex-row md:min-h-screen">
+        <div className="px-4 py-3 md:px-6 md:py-4 text-xl md:text-2xl font-bold text-gray-800 border-b w-full">
+          Admin Panel
+        </div>
+
+        <nav className="flex-1 px-2 py-3 md:px-4 md:py-6 flex md:block gap-2 md:space-y-2">
+          <button
+            onClick={() => window.scrollTo(0, 0)}
+            className="w-full text-left block px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-700 font-medium"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/users")}
+            className="w-full text-left block px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-700 font-medium"
+          >
+            Users
+          </button>
+        </nav>
+
+        <button
+          onClick={handleLogout}
+          className="m-2 md:m-4 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm md:text-base"
+        >
+          Logout
+        </button>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-3 md:p-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
+          Pending Approvals
+        </h1>
+
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+        {loading ? (
+          <p className="text-center text-gray-500 text-lg mt-6">
+            Loading users...
+          </p>
+        ) : users.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg mt-6">
+            No pending users
+          </p>
+        ) : (
+          <div className="space-y-6">
+            {users.map((user) => (
+              <div
+                key={user._id}
+                className="bg-white shadow-md rounded-2xl p-4 md:p-5 flex flex-col md:flex-row gap-4 md:gap-5 items-start md:items-center"
+              >
+                {user.photo ? (
+                  <img
+                    src={user.photo}
+                    alt={user.name}
+                    className={`w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border ${
+                      user.membershipStatus !== "approved" ? "blur-sm" : ""
+                    }`}
+                  />
+                ) : (
+                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                    No Photo
+                  </div>
+                )}
+
+                <div className="flex-1 text-sm md:text-base space-y-1">
+                  <p><b>Photo:</b> {user.photoId}</p>
+                  <p><b>Name:</b> {user.name}</p>
+                  <p><b>Nickname:</b> {user.nickname}</p>
+                  <p><b>Email:</b> {user.email || "—"}</p>
+                  <p><b>Phone:</b> {user.phone}</p>
+                  <p><b>BloodGroup:</b> {user.bloodGroup}</p>
+                  <p><b>Address:</b> {user.address}</p>
+                  <p><b>Age:</b> {user.age}</p>
+                  <p><b>DOB:</b> {user.dob}</p>
+                  <p><b>Valid Upto:</b> {user.expiryDate}</p>
+
+                  {user.paymentProof && (
+                    <a
+                      href={user.paymentProof}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 text-sm"
+                    >
+                      View Payment Proof
+                    </a>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap gap-2 md:gap-3 w-full md:w-auto">
+                  <button
+                    onClick={() => approveUser(user._id)}
+                    disabled={actionLoading === user._id}
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      actionLoading === user._id
+                        ? "bg-green-400 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
+                  >
+                    {actionLoading === user._id ? "Processing..." : "Approve"}
+                  </button>
+
+                  <button
+                    onClick={() => rejectUser(user._id)}
+                    disabled={actionLoading === user._id}
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      actionLoading === user._id
+                        ? "bg-red-400 cursor-not-allowed"
+                        : "bg-red-600 hover:bg-red-700"
+                    }`}
+                  >
+                    {actionLoading === user._id ? "Processing..." : "Reject"}
+                  </button>
+
+                  <button
+                    onClick={() => openWhatsApp(user)}
+                    className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
+                  >
+                    WhatsApp
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
