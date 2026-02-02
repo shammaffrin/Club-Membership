@@ -188,9 +188,16 @@ export default function MemberRegister() {
             )}
           </div>
 
-          <button className="w-full bg-blue-800 text-white py-3 rounded-xl">
-            REGISTER
-          </button>
+          <button
+  type="submit"
+  disabled={loading}
+  className={`w-full bg-blue-800 text-white py-3 rounded-xl ${
+    loading ? "opacity-60 cursor-not-allowed" : "hover:opacity-90"
+  }`}
+>
+  {loading ? "Registering..." : "REGISTER"}
+</button>
+
         </form>
       </div>
 
