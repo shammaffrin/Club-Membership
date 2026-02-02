@@ -6,48 +6,56 @@ import User from "../models/User.js";
 const router = express.Router();
 
 /* ======================
-   GET user by ID
+   GET USER BY ID
 ====================== */
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user)
-      return res.status(404).json({ success: false, message: "User not found" });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
     res.json({ success: true, user });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 });
 
 /* ======================
-   UPLOAD PAYMENT PROOF
+   UPLOAD PAYMENT SCREENSHOT
 ====================== */
 router.post(
   "/upload-payment/:id",
-  upload.single("paymentProof"),
+  upload.single("paymentScreenshot"),
   async (req, res) => {
     try {
-      // 1️⃣ Check file
+      // 1️⃣ File check
       if (!req.file) {
         return res.status(400).json({
           success: false,
-          message: "No file uploaded",
+          message: "No payment screenshot uploaded",
         });
       }
 
-      // 2️⃣ Update user
+      // 2️⃣ Update user with Cloudinary data
       const user = await User.findByIdAndUpdate(
         req.params.id,
         {
-          paymentProof: req.file.filename,
+          paymentScreenshot: req.file.path,      // ✅ secure_url
+          paymentScreenshotId: req.file.filename, // ✅ public_id
           membershipStatus: "pending_approval",
         },
-        { new: true } // return updated user
+        { new: true }
       );
 
-      // 3️⃣ Check user
+      // 3️⃣ User check
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -56,14 +64,13 @@ router.post(
       }
 
       // 4️⃣ Success
-      res.json({
+      res.status(200).json({
         success: true,
-        user, // return updated user
-        filename: req.file.filename,
-        message: "Payment proof uploaded successfully",
+        message: "Payment screenshot uploaded successfully",
+        user,
       });
     } catch (error) {
-      console.error("UPLOAD ERROR:", error);
+      console.error("UPLOAD PAYMENT ERROR:", error);
       res.status(500).json({
         success: false,
         message: error.message,

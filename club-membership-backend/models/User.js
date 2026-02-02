@@ -21,7 +21,6 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
 
-    // DOB (NOT mandatory)
     dob: {
       type: Date,
       default: null,
@@ -58,26 +57,38 @@ const userSchema = new mongoose.Schema(
        CLOUDINARY PROFILE PHOTO
     ====================== */
     photo: {
-      type: String, // Cloudinary secure_url
-      required: true,
+      type: String, // secure_url
+      default: null,
     },
 
     photoId: {
-      type: String, // Cloudinary public_id
-      required: true,
+      type: String, // public_id
+      default: null,
+    },
+
+    /* ======================
+       PAYMENT SCREENSHOT
+    ====================== */
+    paymentScreenshot: {
+      type: String,
+      default: null,
+    },
+
+    paymentScreenshotId: {
+      type: String,
+      default: null,
     },
 
     approvedAt: {
       type: Date,
+      default: null,
     },
 
     expiryDate: {
       type: Date,
+      default: null,
     },
 
-    /* ======================
-       MEMBERSHIP
-    ====================== */
     membershipStatus: {
       type: String,
       enum: ["registered", "pending_approval", "approved", "rejected"],
@@ -90,11 +101,8 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    /* ======================
-       FUTURE USE (OPTIONAL)
-    ====================== */
     membershipCard: {
-      type: String, // URL (PDF or image if uploaded later)
+      type: String,
       default: null,
     },
   },

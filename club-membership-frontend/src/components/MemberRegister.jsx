@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import imageCompression from "browser-image-compression";
 
 import Lines from "../assets/lines.webp";
 import CenterLogo from "../assets/logo-Malayalam.webp";
@@ -20,16 +21,39 @@ export default function MemberRegister() {
   });
 
   const [photo, setPhoto] = useState(null);
+  const [paymentScreenshot, setPaymentScreenshot] = useState(null);
+
   const [membershipId, setMembershipId] = useState("");
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [loading, setLoading] = useState(false); // ADDED
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  /* ======================
+     IMAGE COMPRESSION
+  ====================== */
+  const compressImage = async (file) => {
+    return await imageCompression(file, {
+      maxSizeMB: 0.4, // lower for phones
+      maxWidthOrHeight: 900,
+      useWebWorker: true,
+    });
+  };
+
+  const handlePhotoChange = async (e) => {
+    if (!e.target.files[0]) return;
+    setPhoto(await compressImage(e.target.files[0]));
+  };
+
+  const handlePaymentChange = async (e) => {
+    if (!e.target.files[0]) return;
+    setPaymentScreenshot(await compressImage(e.target.files[0]));
+  };
 
   /* ======================
      VALIDATION
@@ -42,183 +66,137 @@ export default function MemberRegister() {
     if (!formData.bloodGroup) newErrors.bloodGroup = "Select blood group";
     if (!formData.address.trim()) newErrors.address = "Required";
     if (!photo) newErrors.photo = "Photo required";
+    if (!paymentScreenshot)
+      newErrors.payment = "Payment screenshot required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   /* ======================
-     SUBMIT
+     SUBMIT (NO LAG)
   ====================== */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     try {
-      setLoading(true); // ADDED
+      setLoading(true);
 
-      const data = new FormData();
-      Object.entries(formData).forEach(([k, v]) => v && data.append(k, v));
-      data.append("photo", photo);
-
+      // STEP 1: FAST REGISTER (TEXT ONLY)
       const res = await axios.post(
         "https://club-membership.vercel.app/api/auth/register",
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } },
+        formData
       );
 
-      setMembershipId(res.data.membershipId);
+      const memberId = res.data.membershipId;
+      setMembershipId(memberId);
       setShowSuccessModal(true);
       setAlreadyRegistered(false);
+
+      // STEP 2: UPLOAD IMAGES IN BACKGROUND
+      const imgData = new FormData();
+      imgData.append("membershipId", memberId);
+      imgData.append("photo", photo);
+      imgData.append("paymentScreenshot", paymentScreenshot);
+
+      axios.post(
+        "https://club-membership.vercel.app/api/auth/upload-images",
+        imgData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
     } catch (err) {
       const msg = err.response?.data?.message || "Something went wrong";
-      msg.includes("already exists") ? setAlreadyRegistered(true) : alert(msg);
+      msg.includes("already exists")
+        ? setAlreadyRegistered(true)
+        : alert(msg);
     } finally {
-      setLoading(false); // ADDED
+      setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen flex items-center justify-center relative px-4 sm:px-6">
-      {/* BACKGROUND */}
+    <div className="h-screen flex items-center justify-center relative px-4">
       <img
         src={Lines}
-        className="absolute bottom-0 left-0 w-full h-[400px] sm:h-[600px] opacity-40 -z-10 object-cover"
+        className="absolute bottom-0 left-0 w-full h-[400px] opacity-40 -z-10 object-cover"
         alt=""
       />
 
-      {/* MAIN BOX */}
-      <div className="relative w-full max-w-3xl rounded-2xl px-4 sm:px-10 py-4 sm:py-6">
+      <div className="relative w-full max-w-3xl rounded-2xl px-4 sm:px-10 py-6 bg-white/90">
         <img
           src={Hashtag}
-          className="absolute right-3 sm:right-7 bottom-0 h-6 sm:h-7 pt-2"
+          className="absolute right-4 bottom-0 h-6"
           alt=""
         />
 
-        <div className="flex justify-center items-center mb-2 gap-2 flex-wrap">
-          <img src={CenterLogo} className="h-14 sm:h-20" />
-          <img src={ClubName} className="h-14 sm:h-20" />
+        <div className="flex justify-center gap-2 mb-3">
+          <img src={CenterLogo} className="h-16" />
+          <img src={ClubName} className="h-16" />
         </div>
 
-        <h1 className="text-center text-lg sm:text-2xl font-extrabold mb-3">
+        <h1 className="text-center text-xl font-extrabold mb-4">
           MEMBER REGISTRATION
         </h1>
 
         {alreadyRegistered && (
-          <p className="text-red-600 text-center mb-4">
+          <p className="text-red-600 text-center mb-3">
             Phone number already registered
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={handleSubmit}
+          className={`space-y-4 ${
+            loading ? "pointer-events-none opacity-70" : ""
+          }`}
+        >
           <div className="grid sm:grid-cols-2 gap-4">
-            <input
-              name="name"
-              placeholder="Full Name"
-              onChange={handleChange}
-              className="p-2 border rounded-lg"
-            />
-            <input
-              name="nickname"
-              placeholder="Nickname"
-              onChange={handleChange}
-              className="p-2 border rounded-lg"
-            />
+            <input name="name" placeholder="Full Name" onChange={handleChange} className="p-2 border rounded-lg" />
+            <input name="nickname" placeholder="Nickname" onChange={handleChange} className="p-2 border rounded-lg" />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
-            <input
-              type="number"
-              name="age"
-              placeholder="Age"
-              onChange={handleChange}
-              className="p-2 border rounded-lg"
-            />
-            <input
-              name="phone"
-              placeholder="Mobile Number"
-              onChange={handleChange}
-              className="p-2 border rounded-lg"
-            />
+            <input type="number" name="age" placeholder="Age" onChange={handleChange} className="p-2 border rounded-lg" />
+            <input name="phone" placeholder="Mobile Number" onChange={handleChange} className="p-2 border rounded-lg" />
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">
-            <input
-              name="email"
-              placeholder="Email (optional)"
-              onChange={handleChange}
-              className="p-2 border rounded-lg"
-            />
-            <div>
-              <input
-                type="date"
-                placeholder="Date Of Birth"
-                name="dob"
-                onChange={handleChange}
-                className="p-2 border rounded-lg"
-              />
-            </div>
-            <select
-              name="bloodGroup"
-              onChange={handleChange}
-              className="p-2 border rounded-lg"
-            >
-              <option value="">Select Blood Group</option>
+            <input name="email" placeholder="Email (optional)" onChange={handleChange} className="p-2 border rounded-lg" />
+            <input type="date" name="dob" onChange={handleChange} className="p-2 border rounded-lg" />
+            <select name="bloodGroup" onChange={handleChange} className="p-2 border rounded-lg">
+              <option value="">Blood Group</option>
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
                 <option key={bg}>{bg}</option>
               ))}
             </select>
           </div>
 
-          <textarea
-            name="address"
-            placeholder="Address"
-            onChange={handleChange}
-            className="h-24 p-2 w-full border rounded-lg"
-          />
+          <textarea name="address" placeholder="Address" onChange={handleChange} className="h-24 p-2 w-full border rounded-lg" />
 
           <div>
-            <label className="block text-sm font-semibold mb-1">
-              Upload Profile Photo
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              className="p-2 w-full border rounded-lg"
-              onChange={(e) => setPhoto(e.target.files[0])}
-            />
-            {errors.photo && (
-              <p className="text-red-500 text-sm">{errors.photo}</p>
+            <label className="text-sm font-semibold">Profile Photo</label>
+            <input type="file" accept="image/*" onChange={handlePhotoChange} />
+            {errors.photo && <p className="text-red-500 text-sm">{errors.photo}</p>}
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold">Payment Screenshot</label>
+            <input type="file" accept="image/*" onChange={handlePaymentChange} />
+            {errors.payment && (
+              <p className="text-red-500 text-sm">{errors.payment}</p>
             )}
           </div>
 
-          <button
-            disabled={loading} // ADDED
-            className={`w-full text-white py-3 rounded-xl ${
-              loading
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-blue-700 to-blue-900"
-            }`} // ADDED
-          >
-            {loading ? "Registering..." : "REGISTER"} {/* ADDED */}
+          <button className="w-full bg-blue-800 text-white py-3 rounded-xl">
+            REGISTER
           </button>
-
-          <p className="text-center text-sm mt-3">
-            Already registered?{" "}
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="text-blue-700 font-semibold"
-            >
-              Login
-            </button>
-          </p>
         </form>
       </div>
 
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
-          <div className="p-6 bg-white rounded-xl text-center">
+          <div className="bg-white p-6 rounded-xl text-center">
             <h2 className="text-2xl font-bold text-green-600">
               Registration Successful 🎉
             </h2>

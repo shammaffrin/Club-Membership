@@ -29,13 +29,21 @@ router.get("/pending-users", adminAuth, async (req, res) => {
 ========================= */
 router.put("/approve/:id", adminAuth, async (req, res) => {
   try {
-    const id = req.params.id; // ✅ define the ID
+    const id = req.params.id;
     const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found",
+      });
+    }
+
+    // 🔒 IMPORTANT CHECK (NO IMAGE = NO APPROVAL)
+    if (!user.photo || !user.paymentScreenshot) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile photo and payment proof are required before approval",
       });
     }
 
@@ -47,17 +55,9 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
     const expiryDate = new Date(approvedAt);
     expiryDate.setFullYear(expiryDate.getFullYear() + 1);
 
-    // update the database using the ID
-    await User.findByIdAndUpdate(id, {
-      membershipStatus: "approved",
-      approvedAt,
-      expiryDate,
-    });
-
-    // update the local user object before sending response
+    user.membershipStatus = "approved";
     user.approvedAt = approvedAt;
     user.expiryDate = expiryDate;
-    user.membershipStatus = "approved";
 
     await user.save();
 
@@ -73,6 +73,7 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
     });
   }
 });
+
 
 
 
