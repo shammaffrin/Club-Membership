@@ -12,6 +12,40 @@ export default function AdminUserList() {
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
 
+  // Format date to DD/MM/YYYY
+  const formatDate = (date) => {
+    if (!date) return "—";
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  // WhatsApp share link generator
+  const getWhatsAppLink = (user) => {
+    const phone = user.phone.startsWith("+") ? user.phone : `+91${user.phone}`;
+    let message = "";
+
+    if (user.membershipStatus === "approved") {
+      message = `Hello ${user.name}, your membership has been approved!\n` +
+        `Membership ID: ${user.membershipId}\n` +
+        `Details:\n` +
+        `Name: ${user.name}\n` +
+        `Father Name: ${user.fatherName || "—"}\n` +
+        `Nickname: ${user.nickname || "—"}\n` +
+        `Phone: ${user.phone}\n` +
+        `Age: ${user.age || "—"}\n` +
+        `DOB: ${formatDate(user.dob)}\n` +
+        `Blood Group: ${user.bloodGroup || "—"}\n` +
+        `Address: ${user.address || "—"}`;
+    } else if (user.membershipStatus === "rejected") {
+      message = `Hello ${user.name}, your membership request was rejected. Please contact us for more details.`;
+    }
+
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  };
+
   const fetchUsers = async () => {
     setLoading(true);
     setError("");
@@ -24,15 +58,12 @@ export default function AdminUserList() {
 
       const res = await axios.get(
         "https://club-membership.vercel.app/api/admin/all-users",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       const users = res.data.users || [];
-
-      setApprovedUsers(users.filter(u => u.membershipStatus === "approved"));
-      setRejectedUsers(users.filter(u => u.membershipStatus === "rejected"));
+      setApprovedUsers(users.filter((u) => u.membershipStatus === "approved"));
+      setRejectedUsers(users.filter((u) => u.membershipStatus === "rejected"));
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to fetch users");
@@ -109,9 +140,7 @@ export default function AdminUserList() {
           <button
             onClick={() => setFilter("all")}
             className={`px-4 py-2 rounded-lg ${
-              filter === "all"
-                ? "bg-gray-800 text-white"
-                : "bg-white border"
+              filter === "all" ? "bg-gray-800 text-white" : "bg-white border"
             }`}
           >
             All
@@ -131,9 +160,7 @@ export default function AdminUserList() {
           <button
             onClick={() => setFilter("rejected")}
             className={`px-4 py-2 rounded-lg ${
-              filter === "rejected"
-                ? "bg-red-600 text-white"
-                : "bg-white border"
+              filter === "rejected" ? "bg-red-600 text-white" : "bg-white border"
             }`}
           >
             Rejected
@@ -151,31 +178,56 @@ export default function AdminUserList() {
               <p className="text-gray-500">No approved users.</p>
             ) : (
               <div className="space-y-4">
-                {approvedUsers.map(user => (
+                {approvedUsers.map((user) => (
                   <div
                     key={user._id}
-                    className="bg-white shadow-md rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center"
+                    className="bg-white shadow-md rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
                   >
                     <img
                       src={user.photo || "/default-user.png"}
                       alt={user.name}
                       className="w-24 h-24 rounded-full object-cover border"
-                      onError={(e) =>
-                        (e.target.src = "/default-user.png")
-                      }
+                      onError={(e) => (e.target.src = "/default-user.png")}
                     />
 
                     <div className="flex-1 space-y-1 text-sm md:text-base">
                       <p><b>Name:</b> {user.name}</p>
-                      <p><b>Nickname:</b> {user.nickname}</p>
-                      <p><b>Email:</b> {user.email}</p>
+                      <p><b>Father Name:</b> {user.fatherName || "—"}</p>
+                      <p><b>Nickname:</b> {user.nickname || "—"}</p>
+                      <p><b>Email:</b> {user.email || "—"}</p>
                       <p><b>Phone:</b> {user.phone}</p>
+                      <p><b>Age:</b> {user.age || "—"}</p>
+                      <p><b>DOB:</b> {formatDate(user.dob)}</p>
+                      <p><b>Blood Group:</b> {user.bloodGroup || "—"}</p>
+                      <p><b>Address:</b> {user.address || "—"}</p>
                       <p><b>Membership ID:</b> {user.membershipId}</p>
+                      <p><b>Valid Upto:</b> {formatDate(user.expiryDate)}</p>
+
+                      {user.paymentProof && (
+                        <a
+                          href={user.paymentProof}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 text-sm"
+                        >
+                          View Payment Proof
+                        </a>
+                      )}
                     </div>
 
-                    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
-                      Approved
-                    </span>
+                    <div className="flex flex-col md:flex-row gap-2 items-center">
+                      <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
+                        Approved
+                      </span>
+                      <a
+                        href={getWhatsAppLink(user)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-900"
+                      >
+                        Share
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -194,20 +246,54 @@ export default function AdminUserList() {
               <p className="text-gray-500">No rejected users.</p>
             ) : (
               <div className="space-y-4">
-                {rejectedUsers.map(user => (
+                {rejectedUsers.map((user) => (
                   <div
                     key={user._id}
-                    className="bg-white shadow-md rounded-xl p-4 flex justify-between items-center"
+                    className="bg-white shadow-md rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
                   >
-                    <div className="space-y-1">
+                    <img
+                      src={user.photo || "/default-user.png"}
+                      alt={user.name}
+                      className="w-24 h-24 rounded-full object-cover border"
+                      onError={(e) => (e.target.src = "/default-user.png")}
+                    />
+
+                    <div className="flex-1 space-y-1 text-sm md:text-base">
                       <p><b>Name:</b> {user.name}</p>
-                      <p><b>Email:</b> {user.email}</p>
+                      <p><b>Father Name:</b> {user.fatherName || "—"}</p>
+                      <p><b>Nickname:</b> {user.nickname || "—"}</p>
+                      <p><b>Email:</b> {user.email || "—"}</p>
                       <p><b>Phone:</b> {user.phone}</p>
+                      <p><b>Age:</b> {user.age || "—"}</p>
+                      <p><b>DOB:</b> {formatDate(user.dob)}</p>
+                      <p><b>Blood Group:</b> {user.bloodGroup || "—"}</p>
+                      <p><b>Address:</b> {user.address || "—"}</p>
+
+                      {user.paymentProof && (
+                        <a
+                          href={user.paymentProof}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-blue-600 text-sm"
+                        >
+                          View Payment Proof
+                        </a>
+                      )}
                     </div>
 
-                    <span className="px-3 py-1 bg-red-500 text-white rounded-full text-sm">
-                      Rejected
-                    </span>
+                    <div className="flex flex-col md:flex-row gap-2 items-center">
+                      <span className="px-3 py-1 bg-red-500 text-white rounded-full text-sm">
+                        Rejected
+                      </span>
+                      <a
+                        href={getWhatsAppLink(user)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-900"
+                      >
+                        Share
+                      </a>
+                    </div>
                   </div>
                 ))}
               </div>
