@@ -11,6 +11,7 @@ import Hashtag from "../assets/hashtag.webp";
 export default function MemberRegister() {
   const [formData, setFormData] = useState({
     name: "",
+    fatherName: "",
     nickname: "",
     age: "",
     phone: "",
@@ -22,10 +23,10 @@ export default function MemberRegister() {
 
   const [photo, setPhoto] = useState(null);
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
-
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) =>
@@ -44,18 +45,43 @@ export default function MemberRegister() {
     setPaymentScreenshot(await compressImage(e.target.files[0]));
   };
 
+  /* ======================
+     VALIDATION
+  ====================== */
   const validateForm = () => {
-    const newErrors = {};
-    if (formData.name.trim().length < 3) newErrors.name = "Min 3 characters";
-    if (formData.nickname.trim().length < 2) newErrors.nickname = "Required";
-    if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = "10 digit number";
-    if (!formData.bloodGroup) newErrors.bloodGroup = "Select blood group";
-    if (!formData.address.trim()) newErrors.address = "Required";
-    if (!photo) newErrors.photo = "Profile photo required";
-    if (!paymentScreenshot) newErrors.payment = "Payment screenshot required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const newErrors = {};
+
+  if (formData.name.trim().length < 3)
+    newErrors.name = "Name must be at least 3 characters";
+
+  if (formData.fatherName.trim().length < 3)
+    newErrors.fatherName = "Father name is required";
+
+  if (!/^\d{10}$/.test(formData.phone))
+    newErrors.phone = "Enter a valid 10-digit number";
+
+  // ✅ Either Age OR DOB must be given
+  if (!formData.age && !formData.dob) {
+    newErrors.age = "Age or DOB is required";
+    newErrors.dob = "Age or DOB is required";
+  }
+
+  if (!formData.bloodGroup)
+    newErrors.bloodGroup = "Select blood group";
+
+  if (!formData.address.trim())
+    newErrors.address = "Address required";
+
+  if (!photo)
+    newErrors.photo = "Profile photo required";
+
+  if (!paymentScreenshot)
+    newErrors.payment = "Payment screenshot required";
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,7 +95,7 @@ export default function MemberRegister() {
       data.append("photo", photo);
       data.append("paymentScreenshot", paymentScreenshot);
 
-      const res = await axios.post(
+      await axios.post(
         "https://club-membership.vercel.app/api/auth/register",
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
@@ -84,32 +110,89 @@ export default function MemberRegister() {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center relative px-4">
-      <img src={Lines} className="absolute bottom-0 left-0 w-full h-[400px] opacity-40 -z-10 object-cover" alt="" />
+    <div className="min-h-screen flex items-center justify-center relative px-4">
+      <img
+        src={Lines}
+        className="absolute bottom-0 left-0 w-full h-[400px] opacity-40 -z-10 object-cover"
+        alt=""
+      />
+
       <div className="relative w-full max-w-3xl rounded-2xl px-4 sm:px-10 py-6 bg-white/90">
         <img src={Hashtag} className="absolute right-4 bottom-0 h-6" alt="" />
+
         <div className="flex justify-center gap-2 mb-3">
           <img src={CenterLogo} className="h-16" />
           <img src={ClubName} className="h-16" />
         </div>
 
-        <h1 className="text-center text-xl font-extrabold mb-4">MEMBER REGISTRATION</h1>
+        <h1 className="text-center text-xl font-extrabold mb-4">
+          MEMBER REGISTRATION
+        </h1>
 
-        <form onSubmit={handleSubmit} className={`space-y-4 ${loading ? "pointer-events-none opacity-70" : ""}`}>
+        <form
+          onSubmit={handleSubmit}
+          className={`space-y-4 ${
+            loading ? "pointer-events-none opacity-70" : ""
+          }`}
+        >
+          {/* Name + Father Name */}
           <div className="grid sm:grid-cols-2 gap-4">
-            <input name="name" placeholder="Full Name" onChange={handleChange} className="p-2 border rounded-lg" />
-            <input name="nickname" placeholder="Nickname" onChange={handleChange} className="p-2 border rounded-lg" />
+            <input
+              name="name"
+              placeholder="Full Name"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
+            <input
+              name="fatherName"
+              placeholder="Father Name"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <input type="number" name="age" placeholder="Age" onChange={handleChange} className="p-2 border rounded-lg" />
-            <input name="phone" placeholder="Mobile Number" onChange={handleChange} className="p-2 border rounded-lg" />
-          </div>
-
+          {/* Email + Mobile + Nickname */}
           <div className="grid sm:grid-cols-3 gap-4">
-            <input name="email" placeholder="Email (optional)" onChange={handleChange} className="p-2 border rounded-lg" />
-            <input type="date" name="dob" onChange={handleChange} className="p-2 border rounded-lg" />
-            <select name="bloodGroup" onChange={handleChange} className="p-2 border rounded-lg">
+            <input
+              name="email"
+              placeholder="Email (optional)"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
+            <input
+              name="phone"
+              placeholder="Mobile Number"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
+            <input
+              name="nickname"
+              placeholder="Nickname"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
+          </div>
+
+          {/* Age + DOB + Blood Group (SAME LINE) */}
+          <div className="grid sm:grid-cols-3 gap-4">
+            <input
+              type="number"
+              name="age"
+              placeholder="Age"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
+            <input
+              type="date"
+              name="dob"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            />
+            <select
+              name="bloodGroup"
+              onChange={handleChange}
+              className="p-2 border rounded-lg"
+            >
               <option value="">Blood Group</option>
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
                 <option key={bg}>{bg}</option>
@@ -117,36 +200,51 @@ export default function MemberRegister() {
             </select>
           </div>
 
-          <textarea name="address" placeholder="Address" onChange={handleChange} className="h-24 p-2 w-full border rounded-lg" />
+          <textarea
+            name="address"
+            placeholder="Address"
+            onChange={handleChange}
+            className="h-24 p-2 w-full border rounded-lg"
+          />
 
+          {/* Profile Photo */}
           <div>
             <label>Profile Photo</label>
             <input type="file" accept="image/*" onChange={handlePhotoChange} />
-            {errors.photo && <p className="text-red-500 text-sm">{errors.photo}</p>}
+            {errors.photo && (
+              <p className="text-red-500 text-sm">{errors.photo}</p>
+            )}
           </div>
 
+          {/* Payment Screenshot */}
           <div>
             <label>Payment Screenshot</label>
             <input type="file" accept="image/*" onChange={handlePaymentChange} />
-            {errors.payment && <p className="text-red-500 text-sm">{errors.payment}</p>}
+            {errors.payment && (
+              <p className="text-red-500 text-sm">{errors.payment}</p>
+            )}
           </div>
 
-         <button
-  type="submit"
-  className="w-full bg-blue-800 text-white py-3 rounded-xl"
-  disabled={loading}
->
-  {loading ? "Registering..." : "REGISTER"}
-</button>
-
+          <button
+            type="submit"
+            className="w-full bg-blue-800 text-white py-3 rounded-xl"
+            disabled={loading}
+          >
+            {loading ? "Registering..." : "REGISTER"}
+          </button>
         </form>
       </div>
 
       {showSuccessModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
           <div className="bg-white p-6 rounded-xl text-center">
-            <h2 className="text-2xl font-bold text-green-600">Registration Successful 🎉</h2>
-            <button onClick={() => navigate("/")} className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg">
+            <h2 className="text-2xl font-bold text-green-600">
+              Registration Successful 🎉
+            </h2>
+            <button
+              onClick={() => navigate("/")}
+              className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg"
+            >
               Go to Login
             </button>
           </div>

@@ -36,6 +36,7 @@ router.post(
     try {
       const {
         name,
+        fatherName,          // ✅ ADDED
         nickname,
         email,
         age,
@@ -45,8 +46,12 @@ router.post(
         dob,
       } = req.body;
 
+      /* ======================
+         BASIC VALIDATION
+      ====================== */
       if (
         !name ||
+        !fatherName ||       // ✅ REQUIRED
         !nickname ||
         !age ||
         !phone ||
@@ -66,17 +71,25 @@ router.post(
         });
       }
 
+      /* ======================
+         DUPLICATE PHONE CHECK
+      ====================== */
       const existingUser = await User.findOne({ phone });
       if (existingUser) {
-        return res
-          .status(409)
-          .json({ success: false, message: "Phone already exists" });
+        return res.status(409).json({
+          success: false,
+          message: "Phone already exists",
+        });
       }
 
       const membershipId = await getNextMembershipId();
 
+      /* ======================
+         CREATE USER
+      ====================== */
       const user = await User.create({
         name,
+        fatherName,          // ✅ SAVED
         nickname,
         email: email || null,
         age,
@@ -84,16 +97,16 @@ router.post(
         bloodGroup,
         address,
         dob: dob || null,
+
         membershipId,
         membershipStatus: "pending_approval",
 
-        // ✅ MATCH SCHEMA
+        // Cloudinary uploads
         photo: req.files.photo[0].path,
         photoId: req.files.photo[0].filename,
 
-       paymentProof: req.files.paymentScreenshot[0].path,
-paymentProofId: req.files.paymentScreenshot[0].filename,
-
+        paymentProof: req.files.paymentScreenshot[0].path,
+        paymentProofId: req.files.paymentScreenshot[0].filename,
       });
 
       res.status(201).json({

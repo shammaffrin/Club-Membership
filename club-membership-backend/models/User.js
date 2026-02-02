@@ -8,6 +8,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    fatherName: {
+      type: String,
+      required: true,   // 👈 make false if optional
+      trim: true,
+    },
+
     nickname: {
       type: String,
       required: true,
@@ -67,21 +73,17 @@ const userSchema = new mongoose.Schema(
     },
 
     /* ======================
-       PAYMENT SCREENSHOT
+       CLOUDINARY PAYMENT PROOF
     ====================== */
-    /* ======================
-   CLOUDINARY PAYMENT PROOF
-====================== */
-paymentProof: {
-  type: String,        // Cloudinary secure_url
-  default: null,
-},
+    paymentProof: {
+      type: String, // secure_url
+      default: null,
+    },
 
-paymentProofId: {
-  type: String,        // Cloudinary public_id
-  default: null,
-},
-
+    paymentProofId: {
+      type: String, // public_id
+      default: null,
+    },
 
     approvedAt: {
       type: Date,

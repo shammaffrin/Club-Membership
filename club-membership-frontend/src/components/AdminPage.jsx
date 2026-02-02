@@ -7,8 +7,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const [previewImage, setPreviewImage] = useState(null);
 
+  const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
 
   const authHeader = {
@@ -30,10 +31,9 @@ export default function AdminPage() {
       );
       setUsers(res.data.users || []);
     } catch (err) {
-      console.error("Fetch users error:", err.response?.data);
+      console.error(err);
       if (err.response?.status === 401 || err.response?.status === 403) {
         localStorage.removeItem("adminToken");
-        setUsers([]);
         navigate("/admin-login");
       } else {
         setError(err.response?.data?.message || "Error fetching users");
@@ -43,58 +43,35 @@ export default function AdminPage() {
     }
   };
 
-  const openWhatsApp = (user) => {
-    const message = `
-Membership Approved ✅
-
-Name: ${user.name}
-Nickname: ${user.nickname}
-Membership ID: ${user.membershipId || "Will be generated"}
-Phone: ${user.phone}
-Blood Group: ${user.bloodGroup}
-DOB: ${user.dob}
-Valid Upto: ${user.expiryDate}
-
-Welcome to the club 🎉
-    `;
-
-    const encodedMessage = encodeURIComponent(message);
-    const phone = user.phone.replace(/\D/g, "");
-
-    window.open(`https://wa.me/${phone}?text=${encodedMessage}`, "_blank");
-  };
-
-  const approveUser = async (user) => {
+  const approveUser = async (id) => {
     try {
-      setActionLoading(user);
+      setActionLoading(id);
       setError("");
       const res = await axios.put(
-        `https://club-membership.vercel.app/api/admin/approve/${user}`,
+        `https://club-membership.vercel.app/api/admin/approve/${id}`,
         {},
         authHeader
       );
       alert(`User approved! Membership ID: ${res.data.user.membershipId}`);
       fetchUsers();
     } catch (err) {
-      console.error("Approve error:", err.response?.data);
       setError(err.response?.data?.message || "Error approving user");
     } finally {
       setActionLoading(null);
     }
   };
 
-  const rejectUser = async (user) => {
+  const rejectUser = async (id) => {
     try {
-      setActionLoading(user);
+      setActionLoading(id);
       setError("");
       await axios.put(
-        `https://club-membership.vercel.app/api/admin/reject/${user}`,
+        `https://club-membership.vercel.app/api/admin/reject/${id}`,
         {},
         authHeader
       );
       fetchUsers();
     } catch (err) {
-      console.error("Reject error:", err.response?.data);
       setError(err.response?.data?.message || "Error rejecting user");
     } finally {
       setActionLoading(null);
@@ -107,31 +84,35 @@ Welcome to the club 🎉
   };
 
   useEffect(() => {
-    if (!token) {
-      navigate("/admin-login");
-      return;
-    }
-    fetchUsers();
-  }, [token, navigate]);
+    if (!token) navigate("/admin-login");
+    else fetchUsers();
+  }, [token]);
+
+  const formatDate = (date) => {
+  if (!date) return "—";
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
 
   return (
     <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col flex-row md:min-h-screen">
-        <div className="px-4 py-3 md:px-6 md:py-4 text-xl md:text-2xl font-bold text-gray-800 border-b w-full">
+      <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col">
+        <div className="px-6 py-4 text-2xl font-bold border-b">
           Admin Panel
         </div>
 
-        <nav className="flex-1 px-2 py-3 md:px-4 md:py-6 flex md:block gap-2 md:space-y-2">
-          <button
-            onClick={() => window.scrollTo(0, 0)}
-            className="w-full text-left block px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-700 font-medium"
-          >
+        <nav className="flex-1 p-4 space-y-2">
+          <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200">
             Dashboard
           </button>
           <button
             onClick={() => navigate("/users")}
-            className="w-full text-left block px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-700 font-medium"
+            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
           >
             Users
           </button>
@@ -139,26 +120,24 @@ Welcome to the club 🎉
 
         <button
           onClick={handleLogout}
-          className="m-2 md:m-4 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm md:text-base"
+          className="m-4 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
         >
           Logout
         </button>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-3 md:p-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Pending Approvals
-        </h1>
+      {/* Main */}
+      <main className="flex-1 p-4 md:p-6">
+        <h1 className="text-3xl font-bold mb-6">Pending Approvals</h1>
 
         {error && <p className="text-red-500 mb-4">{error}</p>}
 
         {loading ? (
-          <p className="text-center text-gray-500 text-lg mt-6">
+          <p className="text-center text-gray-500 text-lg">
             Loading users...
           </p>
         ) : users.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg mt-6">
+          <p className="text-center text-gray-500 text-lg">
             No pending users
           </p>
         ) : (
@@ -166,47 +145,49 @@ Welcome to the club 🎉
             {users.map((user) => (
               <div
                 key={user._id}
-                className="bg-white shadow-md rounded-2xl p-4 md:p-5 flex flex-col md:flex-row gap-4 md:gap-5 items-start md:items-center"
+                className="bg-white shadow rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
               >
-<img
-  src={user.photo || "/no-user.png"}
-  alt={user.name}
-  onError={(e) => (e.target.src = "/no-user.png")}
-  className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border"
-/>
+                {/* Photo */}
+                <img
+                  src={user.photo || "/no-user.png"}
+                  alt={user.name}
+                  onClick={() => setPreviewImage(user.photo)}
+                  onError={(e) => (e.target.src = "/no-user.png")}
+                  className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+                />
 
+                {/* Details */}
+               <div className="flex-1 space-y-1 text-sm md:text-base">
+  <p><b>Name:</b> {user.name}</p>
+  <p><b>Father Name:</b> {user.fatherName || "—"}</p>
+  <p><b>Nickname:</b> {user.nickname}</p>
+  <p><b>Email:</b> {user.email || "—"}</p>
+  <p><b>Phone:</b> {user.phone}</p>
+  <p><b>Blood Group:</b> {user.bloodGroup}</p>
+  <p><b>Address:</b> {user.address}</p>
+  <p><b>DOB:</b> {formatDate(user.dob)}</p>
+  <p><b>Valid Upto:</b> {user.expiryDate}</p>
 
-                <div className="flex-1 text-sm md:text-base space-y-1">
-                  <p><b>Photo:</b> {user.photoId}</p>
-                  <p><b>Name:</b> {user.name}</p>
-                  <p><b>Nickname:</b> {user.nickname}</p>
-                  <p><b>Email:</b> {user.email || "—"}</p>
-                  <p><b>Phone:</b> {user.phone}</p>
-                  <p><b>BloodGroup:</b> {user.bloodGroup}</p>
-                  <p><b>Address:</b> {user.address}</p>
-                  <p><b>Age:</b> {user.age}</p>
-                  <p><b>DOB:</b> {user.dob}</p>
-                  <p><b>Valid Upto:</b> {user.expiryDate}</p>
+  {user.paymentProof && (
+    <a
+      href={user.paymentProof}
+      target="_blank"
+      rel="noreferrer"
+      className="text-blue-600 text-sm"
+    >
+      View Payment Proof
+    </a>
+  )}
+</div>
 
-                  {user.paymentProof && (
-                    <a
-                      href={user.paymentProof}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-600 text-sm"
-                    >
-                      View Payment Proof
-                    </a>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-2 md:gap-3 w-full md:w-auto">
+                {/* Actions */}
+                <div className="flex gap-2">
                   <button
                     onClick={() => approveUser(user._id)}
                     disabled={actionLoading === user._id}
                     className={`px-4 py-2 rounded-lg text-white ${
                       actionLoading === user._id
-                        ? "bg-green-400 cursor-not-allowed"
+                        ? "bg-green-400"
                         : "bg-green-600 hover:bg-green-700"
                     }`}
                   >
@@ -218,16 +199,41 @@ Welcome to the club 🎉
                     disabled={actionLoading === user._id}
                     className={`px-4 py-2 rounded-lg text-white ${
                       actionLoading === user._id
-                        ? "bg-red-400 cursor-not-allowed"
+                        ? "bg-red-400"
                         : "bg-red-600 hover:bg-red-700"
                     }`}
                   >
                     {actionLoading === user._id ? "Processing..." : "Reject"}
                   </button>
-
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* IMAGE PREVIEW MODAL */}
+        {previewImage && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+            onClick={() => setPreviewImage(null)}
+          >
+            <div
+              className="relative max-w-[90%] max-h-[90%]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setPreviewImage(null)}
+                className="absolute -top-4 -right-4 bg-white rounded-full px-3 py-1 text-lg font-bold shadow"
+              >
+                ✕
+              </button>
+
+              <img
+                src={previewImage}
+                alt="User Full"
+                className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
+              />
+            </div>
           </div>
         )}
       </main>
