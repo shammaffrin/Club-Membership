@@ -25,7 +25,7 @@ export default function AdminPage() {
       setLoading(true);
       setError("");
       const res = await axios.get(
-        "http://localhost:5000/api/admin/pending-users",
+        "https://club-membership.vercel.app/api/admin/pending-users",
         authHeader
       );
       setUsers(res.data.users || []);
@@ -69,7 +69,7 @@ Welcome to the club 🎉
       setActionLoading(user);
       setError("");
       const res = await axios.put(
-        `http://localhost:5000/api/admin/approve/${user}`,
+        `https://club-membership.vercel.app/api/admin/approve/${user}`,
         {},
         authHeader
       );
@@ -88,7 +88,7 @@ Welcome to the club 🎉
       setActionLoading(user);
       setError("");
       await axios.put(
-        `http://localhost:5000/api/admin/reject/${user}`,
+        `https://club-membership.vercel.app/api/admin/reject/${user}`,
         {},
         authHeader
       );
