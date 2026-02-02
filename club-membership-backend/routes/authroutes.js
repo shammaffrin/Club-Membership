@@ -2,6 +2,8 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import upload from "../middleware/cloudinaryUpload.js";
+import mongoose from "mongoose";
+
 
 const router = express.Router();
 
@@ -38,6 +40,13 @@ router.post("/register", upload.single("photo"), async (req, res) => {
       address,
       dob, // optional
     } = req.body;
+
+    if (mongoose.connection.readyState !== 1) {
+  return res.status(503).json({
+    success: false,
+    message: "Database not connected. Try again.",
+  });
+}
 
     // ✅ Required field validation
     if (!name || !nickname || !age || !phone || !bloodGroup || !address) {
