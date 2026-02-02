@@ -29,23 +29,13 @@ const getNextMembershipId = async () => {
 router.post("/register", async (req, res) => {
   try {
     const { name, nickname, email, age, phone, bloodGroup, address, dob } = req.body;
-
-    if (!name || !nickname || !age || !phone || !bloodGroup || !address) {
-      return res.status(400).json({
-        success: false,
-        message: "Name, nickname, age, phone, blood group, and address are required",
-      });
-    }
+    console.log("Register request body:", req.body);
 
     const existingUser = await User.findOne({ phone });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "User with this phone number already exists",
-      });
-    }
+    console.log("Existing user check:", existingUser);
 
     const membershipId = await getNextMembershipId();
+    console.log("Generated membershipId:", membershipId);
 
     const user = await User.create({
       name,
@@ -59,6 +49,7 @@ router.post("/register", async (req, res) => {
       membershipStatus: "pending_approval",
       membershipId,
     });
+    console.log("User created:", user);
 
     return res.status(201).json({
       success: true,
@@ -66,10 +57,10 @@ router.post("/register", async (req, res) => {
       membershipId: user.membershipId,
     });
   } catch (err) {
-    console.error("Register error:", err);
+    console.error("Register error detailed:", err);
     return res.status(500).json({
       success: false,
-      message: "Server error",
+      message: err.message,
     });
   }
 });
