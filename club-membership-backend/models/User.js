@@ -69,15 +69,19 @@ const userSchema = new mongoose.Schema(
     /* ======================
        PAYMENT SCREENSHOT
     ====================== */
-    paymentScreenshot: {
-      type: String,
-      default: null,
-    },
+    /* ======================
+   CLOUDINARY PAYMENT PROOF
+====================== */
+paymentProof: {
+  type: String,        // Cloudinary secure_url
+  default: null,
+},
 
-    paymentScreenshotId: {
-      type: String,
-      default: null,
-    },
+paymentProofId: {
+  type: String,        // Cloudinary public_id
+  default: null,
+},
+
 
     approvedAt: {
       type: Date,
