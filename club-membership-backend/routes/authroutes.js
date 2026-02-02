@@ -88,37 +88,53 @@ router.post(
   async (req, res) => {
     try {
       const { membershipId } = req.body;
-      if (!membershipId) return res.status(400).json({ success: false, message: "Membership ID required" });
+      if (!membershipId)
+        return res
+          .status(400)
+          .json({ success: false, message: "Membership ID required" });
 
       const user = await User.findOne({ membershipId });
-      if (!user) return res.status(404).json({ success: false, message: "User not found" });
+      if (!user)
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
 
-      // Save profile photo
+      // ✅ Save profile photo
       if (req.files.photo) {
         const photoFile = req.files.photo[0];
-        user.photo = photoFile.path;
-        user.photoId = photoFile.filename;
+        user.photo = photoFile.path;       // Cloudinary URL
+        user.photoId = photoFile.filename; // Cloudinary public ID
       }
 
-      // Save payment screenshot
+      // ✅ Save payment proof just like photo
       if (req.files.paymentScreenshot) {
         const paymentFile = req.files.paymentScreenshot[0];
-        user.paymentProof = paymentFile.path; // Make sure your User schema has paymentProof
+        user.paymentProof = paymentFile.path;       // Cloudinary URL
+        user.paymentProofId = paymentFile.filename; // Cloudinary public ID
+        user.membershipStatus = "payment_received"; // automatically update status
+      } else {
+        return res.status(400).json({
+          success: false,
+          message: "Payment proof is required",
+        });
       }
 
       await user.save();
 
       res.json({
         success: true,
-        message: "Images uploaded successfully",
+        message: "Photo and payment proof uploaded successfully",
         user,
       });
     } catch (err) {
       console.error("Upload images error:", err);
-      res.status(500).json({ success: false, message: "Server error" });
+      res
+        .status(500)
+        .json({ success: false, message: "Server error" });
     }
   }
 );
+
 
 
 

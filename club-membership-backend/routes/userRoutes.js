@@ -6,71 +6,54 @@ import User from "../models/User.js";
 const router = express.Router();
 
 /* ======================
-   GET USER BY ID
+   GET user by ID
 ====================== */
 router.get("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    if (!user)
+      return res.status(404).json({ success: false, message: "User not found" });
 
     res.json({ success: true, user });
   } catch (err) {
     console.error(err);
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
 
 /* ======================
-   UPLOAD PAYMENT SCREENSHOT
+   UPLOAD PAYMENT PROOF
 ====================== */
 router.post(
   "/upload-payment/:id",
-  upload.single("paymentScreenshot"),
+  upload.single("paymentProof"),
   async (req, res) => {
     try {
-      // 1️⃣ File check
       if (!req.file) {
         return res.status(400).json({
           success: false,
-          message: "No payment screenshot uploaded",
+          message: "No file uploaded",
         });
       }
 
-      // 2️⃣ Update user with Cloudinary data
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
-        {
-          paymentScreenshot: req.file.path,      // ✅ secure_url
-          paymentScreenshotId: req.file.filename, // ✅ public_id
-          membershipStatus: "pending_approval",
-        },
-        { new: true }
-      );
+      const user = await User.findById(req.params.id);
+      if (!user)
+        return res.status(404).json({ success: false, message: "User not found" });
 
-      // 3️⃣ User check
-      if (!user) {
-        return res.status(404).json({
-          success: false,
-          message: "User not found",
-        });
-      }
+      // Save payment proof like photo
+      user.paymentProof = req.file.path;        // Cloudinary URL
+      user.paymentProofId = req.file.filename;  // Cloudinary public ID
+      user.membershipStatus = "payment_received"; // Optional: update status
 
-      // 4️⃣ Success
-      res.status(200).json({
+      await user.save();
+
+      res.json({
         success: true,
-        message: "Payment screenshot uploaded successfully",
+        message: "Payment proof uploaded successfully",
         user,
       });
     } catch (error) {
-      console.error("UPLOAD PAYMENT ERROR:", error);
+      console.error("UPLOAD ERROR:", error);
       res.status(500).json({
         success: false,
         message: error.message,
