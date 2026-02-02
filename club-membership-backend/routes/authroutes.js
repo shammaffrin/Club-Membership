@@ -13,7 +13,61 @@ const router = express.Router();
 const getNextMembershipId = async () => {
   const lastUser = await User.findOne().sort({ createdAt: -1 });
 
-  let nextNumber = 1;
+  letrouter.post(
+  "/register",
+  upload.fields([
+    { name: "photo", maxCount: 1 },
+    { name: "paymentScreenshot", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    try {
+      // Now req.body contains your text fields
+      const { name, nickname, email, age, phone, bloodGroup, address, dob } = req.body;
+
+      if (!name || !nickname || !age || !phone || !bloodGroup || !address) {
+        return res.status(400).json({
+          success: false,
+          message: "All required fields must be filled",
+        });
+      }
+
+      const existingUser = await User.findOne({ phone });
+      if (existingUser) {
+        return res.status(409).json({ success: false, message: "Phone already exists" });
+      }
+
+      const membershipId = await getNextMembershipId();
+
+      const user = await User.create({
+        name,
+        nickname,
+        email: email || null,
+        age,
+        phone,
+        bloodGroup,
+        address,
+        dob: dob || null,
+        membershipStatus: "pending_approval",
+        membershipId,
+        // Save uploaded images if provided
+        photo: req.files.photo ? req.files.photo[0].path : null,
+        photoId: req.files.photo ? req.files.photo[0].filename : null,
+        paymentProof: req.files.paymentScreenshot ? req.files.paymentScreenshot[0].path : null,
+        paymentProofId: req.files.paymentScreenshot ? req.files.paymentScreenshot[0].filename : null,
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Registered successfully",
+        membershipId: user.membershipId,
+      });
+    } catch (err) {
+      console.error("Register error detailed:", err);
+      res.status(500).json({ success: false, message: err.message });
+    }
+  }
+);
+ nextNumber = 1;
 
   if (lastUser?.membershipId) {
     const lastNumber = parseInt(lastUser.membershipId.replace("KSASC", ""), 10);
