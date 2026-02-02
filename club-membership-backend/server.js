@@ -43,7 +43,7 @@ app.use(
   })
 );
 
-/* ======================
+/* ===================
    BODY PARSERS
 ====================== */
 app.use(express.json());
@@ -60,6 +60,11 @@ app.use("/api", membershipCardRoute);
 
 app.get("/", (req, res) => {
   res.send("✅ Club Membership API running");
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
 
 /* ======================
