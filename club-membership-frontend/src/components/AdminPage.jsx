@@ -168,19 +168,13 @@ Welcome to the club 🎉
                 key={user._id}
                 className="bg-white shadow-md rounded-2xl p-4 md:p-5 flex flex-col md:flex-row gap-4 md:gap-5 items-start md:items-center"
               >
-                {user.photo ? (
-                  <img
-                    src={user.photo}
-                    alt={user.name}
-                    className={`w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border ${
-                      user.membershipStatus !== "approved" ? "blur-sm" : ""
-                    }`}
-                  />
-                ) : (
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-gray-200 flex items-center justify-center">
-                    No Photo
-                  </div>
-                )}
+<img
+  src={user.photo || "/no-user.png"}
+  alt={user.name}
+  onError={(e) => (e.target.src = "/no-user.png")}
+  className="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border"
+/>
+
 
                 <div className="flex-1 text-sm md:text-base space-y-1">
                   <p><b>Photo:</b> {user.photoId}</p>
@@ -231,12 +225,6 @@ Welcome to the club 🎉
                     {actionLoading === user._id ? "Processing..." : "Reject"}
                   </button>
 
-                  <button
-                    onClick={() => openWhatsApp(user)}
-                    className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600"
-                  >
-                    WhatsApp
-                  </button>
                 </div>
               </div>
             ))}

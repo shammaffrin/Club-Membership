@@ -131,9 +131,14 @@ export default function MemberRegister() {
             {errors.payment && <p className="text-red-500 text-sm">{errors.payment}</p>}
           </div>
 
-          <button type="submit" className="w-full bg-blue-800 text-white py-3 rounded-xl">
-            {loading ? "Registering..." : "REGISTER"}
-          </button>
+         <button
+  type="submit"
+  className="w-full bg-blue-800 text-white py-3 rounded-xl"
+  disabled={loading}
+>
+  {loading ? "Registering..." : "REGISTER"}
+</button>
+
         </form>
       </div>
 
