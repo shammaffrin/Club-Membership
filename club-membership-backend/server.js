@@ -1,8 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
-
+import cors from "cors";
 import connectCloudinary from "./config/cloudinary.js";
 
 import authRoutes from "./routes/authroutes.js";
@@ -15,43 +14,33 @@ dotenv.config();
 
 const app = express();
 
-/* ======================
-   GLOBAL DB CONNECTION (CRITICAL)
-====================== */
+/* DB Connection */
 if (!mongoose.connection.readyState) {
   mongoose.set("bufferCommands", false);
   await mongoose.connect(process.env.MONGO_URI);
   console.log("✅ MongoDB connected");
 }
 
-/* ======================
-   CLOUDINARY
-====================== */
+/* Cloudinary */
 connectCloudinary();
 
-/* ======================
-   CORS
-====================== */
+/* CORS */
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
       "https://kingstareriyapady.club",
-      "https://membership-front.vercel.app",
+      "https://membership-front.vercel.app"
     ],
-    credentials: true,
+    credentials: true
   })
 );
 
-/* ===================
-   BODY PARSERS
-====================== */
+/* Body parsers */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ======================
-   ROUTES
-====================== */
+/* Routes */
 app.use("/api/auth", authRoutes);
 app.use("/api/member", memberAuthRoutes);
 app.use("/api/user", userRoutes);
@@ -62,12 +51,5 @@ app.get("/", (req, res) => {
   res.send("✅ Club Membership API running");
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
-
-/* ======================
-   EXPORT FOR VERCEL
-====================== */
+/* Export for Vercel */
 export default app;
