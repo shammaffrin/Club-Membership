@@ -26,14 +26,42 @@ const getNextMembershipId = async () => {
 /* ======================
    REGISTER USER
 ====================== */
-router.post("/register", async (req, res) => {
-  try {
-    const { name, nickname, email, age, phone, bloodGroup, address, dob } = req.body;
+router.post("/register", upload.single("photo"), async (req, res) => {
+  let uploadedImage = null;
 
+  try {
+    const {
+      name,
+      nickname,
+      email,
+      age,
+      phone,
+      bloodGroup,
+      address,
+      dob, // optional
+    } = req.body;
+
+    if (mongoose.connection.readyState !== 1) {
+  return res.status(503).json({
+    success: false,
+    message: "Database not connected. Try again.",
+  });
+}
+
+    // ✅ Required field validation
     if (!name || !nickname || !age || !phone || !bloodGroup || !address) {
       return res.status(400).json({
         success: false,
-        message: "Name, nickname, age, phone, blood group, and address are required",
+        message:
+          "Name, nickname, age, phone, blood group, and address are required",
+      });
+    }
+
+    // ✅ Profile photo required
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile photo is required",
       });
     }
 
@@ -47,6 +75,8 @@ router.post("/register", async (req, res) => {
 
     const membershipId = await getNextMembershipId();
 
+    uploadedImage = req.file;
+
     const user = await User.create({
       name,
       nickname,
@@ -55,72 +85,36 @@ router.post("/register", async (req, res) => {
       phone,
       bloodGroup,
       address,
-      dob: dob || null,
+      dob: dob || null, // ✅ DOB optional
+      photo: uploadedImage.path,       // Cloudinary secure_url
+      photoId: uploadedImage.filename, // Cloudinary public_id
       membershipStatus: "pending_approval",
       membershipId,
     });
 
     return res.status(201).json({
       success: true,
-      message: "Registered successfully. Upload images next.",
+      message: "Registered successfully. Await admin approval.",
       membershipId: user.membershipId,
     });
   } catch (err) {
     console.error("Register error:", err);
+
+    // 🧹 Rollback image if DB fails
+    if (uploadedImage?.filename) {
+      try {
+        await cloudinary.uploader.destroy(uploadedImage.filename);
+      } catch (cleanupErr) {
+        console.error("Cloudinary cleanup failed:", cleanupErr);
+      }
+    }
+
     return res.status(500).json({
       success: false,
       message: "Server error",
     });
   }
 });
-
-
-
-/* ======================
-   UPLOAD IMAGES (PHOTO + PAYMENT)
-====================== */
-router.post(
-  "/upload-images",
-  upload.fields([
-    { name: "photo", maxCount: 1 },
-    { name: "paymentScreenshot", maxCount: 1 },
-  ]),
-  async (req, res) => {
-    try {
-      const { membershipId } = req.body;
-      if (!membershipId) return res.status(400).json({ success: false, message: "Membership ID required" });
-
-      const user = await User.findOne({ membershipId });
-      if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-      // Save profile photo
-      if (req.files.photo) {
-        const photoFile = req.files.photo[0];
-        user.photo = photoFile.path;
-        user.photoId = photoFile.filename;
-      }
-
-      // Save payment screenshot
-      if (req.files.paymentScreenshot) {
-        const paymentFile = req.files.paymentScreenshot[0];
-        user.paymentProof = paymentFile.path; // Make sure your User schema has paymentProof
-      }
-
-      await user.save();
-
-      res.json({
-        success: true,
-        message: "Images uploaded successfully",
-        user,
-      });
-    } catch (err) {
-      console.error("Upload images error:", err);
-      res.status(500).json({ success: false, message: "Server error" });
-    }
-  }
-);
-
-
 
 
 /* ======================
