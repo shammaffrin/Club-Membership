@@ -1,8 +1,8 @@
 import express from "express";
+import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 
-import connectDB from "./config/db.js";
 import connectCloudinary from "./config/cloudinary.js";
 
 import authRoutes from "./routes/authroutes.js";
@@ -16,17 +16,22 @@ dotenv.config();
 const app = express();
 
 /* ======================
-   CONNECT SERVICES
+   GLOBAL DB CONNECTION (CRITICAL)
 ====================== */
-await connectDB();          // 🔥 MUST BE AWAITED
+if (!mongoose.connection.readyState) {
+  mongoose.set("bufferCommands", false);
+  await mongoose.connect(process.env.MONGO_URI);
+  console.log("✅ MongoDB connected");
+}
+
+/* ======================
+   CLOUDINARY
+====================== */
 connectCloudinary();
 
 /* ======================
-   MIDDLEWARE
+   CORS
 ====================== */
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
 app.use(
   cors({
     origin: [
@@ -37,6 +42,12 @@ app.use(
     credentials: true,
   })
 );
+
+/* ======================
+   BODY PARSERS
+====================== */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 /* ======================
    ROUTES
@@ -51,4 +62,7 @@ app.get("/", (req, res) => {
   res.send("✅ Club Membership API running");
 });
 
+/* ======================
+   EXPORT FOR VERCEL
+====================== */
 export default app;
