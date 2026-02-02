@@ -16,7 +16,7 @@ export default function AdminLogin() {
 
     try {
       const res = await axios.post(
-        "https://membership-brown.vercel.app/api/auth/admin/login",
+        "https://club-membership.vercel.app/api/auth/admin/login",
         { username: username.trim(), password }
       );
 
