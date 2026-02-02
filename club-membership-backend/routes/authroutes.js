@@ -91,8 +91,9 @@ router.post(
         photo: req.files.photo[0].path,
         photoId: req.files.photo[0].filename,
 
-        paymentScreenshot: req.files.paymentScreenshot[0].path,
-        paymentScreenshotId: req.files.paymentScreenshot[0].filename,
+       paymentProof: req.files.paymentScreenshot[0].path,
+paymentProofId: req.files.paymentScreenshot[0].filename,
+
       });
 
       res.status(201).json({
