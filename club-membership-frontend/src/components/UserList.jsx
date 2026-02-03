@@ -23,28 +23,58 @@ export default function AdminUserList() {
   };
 
   // WhatsApp share link generator
-  const getWhatsAppLink = (user) => {
-    const phone = user.phone.startsWith("+") ? user.phone : `+91${user.phone}`;
-    let message = "";
+  // WhatsApp share link generator
+const getWhatsAppLink = (user) => {
+  const phone = user.phone.startsWith("+")
+    ? user.phone
+    : `91${user.phone}`;
 
-    if (user.membershipStatus === "approved") {
-      message = `Hello ${user.name}, your membership has been approved!\n` +
-        `Membership ID: ${user.membershipId}\n` +
-        `Details:\n` +
-        `Name: ${user.name}\n` +
-        `Father Name: ${user.fatherName || "—"}\n` +
-        `Nickname: ${user.nickname || "—"}\n` +
-        `Phone: ${user.phone}\n` +
-        `Age: ${user.age || "—"}\n` +
-        `DOB: ${formatDate(user.dob)}\n` +
-        `Blood Group: ${user.bloodGroup || "—"}\n` +
-        `Address: ${user.address || "—"}`;
-    } else if (user.membershipStatus === "rejected") {
-      message = `Hello ${user.name}, your membership request was rejected. Please contact us for more details.`;
-    }
+  let message = "";
 
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  };
+  if (user.membershipStatus === "approved") {
+    message = 
+`Hello ${user.name}, Welcome to Kingstar Arts & Sports Club.
+🎉 Your membership has been approved!
+
+Membership ID: *${user.membershipId}*
+Login Mob No.: ${user.phone}
+
+Member Details:
+• Full Name: ${user.name}
+• Display / Nick Name: ${user.nickname || "—"}
+• Father’s Name: ${user.fatherName || "—"}
+• Place: ${user.address || "—"}
+• Blood Group: ${user.bloodGroup || "—"}
+• Valid Upto: ${formatDate(user.expiryDate)}
+
+_Thank you for becoming a member of Kingstar Arts & Sports Club._
+
+------------------------------
+- Sabit Aboobacker (Gen. Sec)
+📞 91 9747656653
+
+_Kingstareriyapady.club_
+https://www.instagram.com/kingstar.club/`;
+  }
+
+  if (user.membershipStatus === "rejected") {
+    message =
+`Hello *${user.name}*,
+Your membership request with Kingstar Eriyapady has been *rejected* due to {{Reason}}.
+
+For further clarification, please contact the Secretary at:
+📞 91 9747656653 (Sabit)
+
+_Thank you for your interest in Kingstar Arts & Sports Club._
+
+---------------------------------
+_Kingstareriyapady.club_
+https://www.instagram.com/kingstar.club/`;
+  }
+
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+};
+
 
   const fetchUsers = async () => {
     setLoading(true);
