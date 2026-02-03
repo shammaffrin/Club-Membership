@@ -7,6 +7,7 @@ import Lines from "../assets/lines.webp";
 import CenterLogo from "../assets/logo-Malayalam.webp";
 import ClubName from "../assets/logo.webp";
 import Hashtag from "../assets/hashtag.webp";
+import Qr from "../assets/qr.jpeg"
 
 export default function MemberRegister() {
   const [formData, setFormData] = useState({
@@ -25,6 +26,7 @@ export default function MemberRegister() {
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const navigate = useNavigate();
@@ -162,9 +164,9 @@ export default function MemberRegister() {
             <div>
               <input
                 name="name"
-                placeholder="Full Name"
+                placeholder="Full Name/മുഴുവൻ പേര്"
                 onChange={handleChange}
-                className={inputClass("name")}
+                className={`${inputClass("name")} placeholder:text-[11px]`}
               />
               {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
             </div>
@@ -173,7 +175,7 @@ export default function MemberRegister() {
               name="nickname"
               placeholder="Nickname / അറിയപ്പെടുന്ന പേര്"
               onChange={handleChange}
-              className="p-2 border rounded-lg w-full border-gray-300"
+              className="p-2 border rounded-lg w-full placeholder:text-[11px] border-gray-300"
             />
           </div>
 
@@ -184,7 +186,7 @@ export default function MemberRegister() {
                 name="email"
                 placeholder="Email(optional)/ ഇ മെയില്‍ ഐഡി"
                 onChange={handleChange}
-                className={inputClass("email")}
+                className={`${inputClass("email")} placeholder:text-[11px]`}
               />
               {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
             </div>
@@ -194,7 +196,7 @@ export default function MemberRegister() {
                 name="phone"
                 placeholder="Mobile Number/മൊബൈല്‍ നമ്പര്‍"
                 onChange={handleChange}
-                className={inputClass("phone")}
+                className={`${inputClass("phone")} placeholder:text-[11px]`}
               />
               {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
             </div>
@@ -202,9 +204,9 @@ export default function MemberRegister() {
             <div>
               <input
                 name="fatherName"
-                placeholder="Father Name"
+                placeholder="Father Name/പിതാവിന്റെ പേര്"
                 onChange={handleChange}
-                className={inputClass("fatherName")}
+                className={`${inputClass("fatherName")} placeholder:text-[11px]`}
               />
               {errors.fatherName && (
                 <p className="text-red-500 text-xs">{errors.fatherName}</p>
@@ -218,31 +220,36 @@ export default function MemberRegister() {
               <input
                 type="number"
                 name="age"
-                placeholder="Age"
+                placeholder="Age/വയസ്"
                 onChange={handleChange}
-                className={inputClass("age")}
+                className={`${inputClass("age")} placeholder:text-[11px]`}
               />
               {errors.age && <p className="text-red-500 text-xs">{errors.age}</p>}
             </div>
 
-            <div>
-              <input
-                type="date"
-                name="dob"
-                onChange={handleChange}
-                className={inputClass("dob")}
-              />
-              {errors.dob && <p className="text-red-500 text-xs">{errors.dob}</p>}
-            </div>
+            <div className="relative">
+  <label className="absolute -top-2 left-3 bg-white px-1 text-[11px] text-gray-500">
+    Date of Birth (DD/MM/YYYY)
+  </label>
+
+  <input
+    type="date"
+    name="dob"
+    onChange={handleChange}
+    className={inputClass("dob")}
+  />
+</div>
+
 
             <div>
               <select
                 name="bloodGroup"
+                placeholder="bloodGroup/ബ്ലഡ് ഗ്രൂപ്പ് " 
                 onChange={handleChange}
-                className={inputClass("bloodGroup")}
+                className={`${inputClass("bloodGroup")} placeholder:text-[11px]`}
               >
                 <option value="">Blood Group</option>
-                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" ,"NIL"].map((bg) => (
                   <option key={bg}>{bg}</option>
                 ))}
               </select>
@@ -256,9 +263,9 @@ export default function MemberRegister() {
           <div>
             <textarea
               name="address"
-              placeholder="Address"
+              placeholder="Address/അഡ്രസ്"
               onChange={handleChange}
-              className={inputClass("address") + " h-24"}
+              className={`${inputClass("address")} placeholder:text-[11px] h-24`}
             />
             {errors.address && (
               <p className="text-red-500 text-xs">{errors.address}</p>
@@ -266,52 +273,90 @@ export default function MemberRegister() {
           </div>
 
           {/* Profile Photo */}
-          <div>
-            <label className="font-medium">Profile Photo</label>
-            <div className="relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer">
-              {photo ? (
-                <img
-                  src={URL.createObjectURL(photo)}
-                  className="w-24 h-24 rounded-full mx-auto object-cover"
-                />
-              ) : (
-                <p className="text-sm text-gray-500">Upload your photo</p>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoChange}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-            </div>
-            {errors.photo && <p className="text-red-500 text-xs">{errors.photo}</p>}
-          </div>
+          <div className="flex gap-5 items-start">
+  {/* LEFT SIDE – Uploads */}
+  <div className="space-y-4 w-full max-w-lg">
+    {/* Profile Photo */}
+    <div>
+      <label className="font-medium text-sm">Profile Photo</label>
+      <div className="relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer">
+        {photo ? (
+          <img
+            src={URL.createObjectURL(photo)}
+            className="w-16 h-16 rounded-full mx-auto object-cover"
+          />
+        ) : (
+          <p className="text-[11px] text-gray-500">
+            Upload photo / ഫോട്ടോ അപ്ലോഡ് ചെയ്യുക
+          </p>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handlePhotoChange}
+          className="absolute inset-0 opacity-0 cursor-pointer"
+        />
+      </div>
+      {errors.photo && (
+        <p className="text-red-500 text-xs">{errors.photo}</p>
+      )}
+    </div>
 
-          {/* Payment Screenshot */}
-          <div>
-            <label className="font-medium">Payment Screenshot</label>
-            <div className="relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer">
-              {paymentScreenshot ? (
-                <img
-                  src={URL.createObjectURL(paymentScreenshot)}
-                  className="w-32 mx-auto"
-                />
-              ) : (
-                <p className="text-sm text-gray-500">
-                  Upload payment screenshot
-                </p>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handlePaymentChange}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-            </div>
-            {errors.payment && (
-              <p className="text-red-500 text-xs">{errors.payment}</p>
-            )}
-          </div>
+    {/* Payment Screenshot */}
+    <div>
+      <label className="font-medium text-sm">Payment Screenshot</label>
+      <div className="relative border-2 border-dashed rounded-lg p-3 text-center cursor-pointer">
+        {paymentScreenshot ? (
+          <img
+            src={URL.createObjectURL(paymentScreenshot)}
+            className="w-24 mx-auto"
+          />
+        ) : (
+          <p className="text-[11px] text-gray-500">
+            Upload payment screenshot / ഫീ അടച്ച് രസീത് അപ്ലോഡ് ചെയ്യുക
+          </p>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handlePaymentChange}
+          className="absolute inset-0 opacity-0 cursor-pointer"
+        />
+      </div>
+      {errors.payment && (
+        <p className="text-red-500 text-xs">{errors.payment}</p>
+      )}
+    </div>
+  </div>
+
+  {/* RIGHT SIDE – QR CODE */}
+  <div className="flex flex-col items-center gap-3">
+    <div className="relative">
+      <img
+        src={Qr}  // replace with your QR image
+        alt="QR Code"
+        className={`w-32 transition-all h-42 duration-300 ${
+          showQR ? "blur-0" : "blur-md"
+        }`}
+      />
+
+      {!showQR && (
+        <button
+          type="button"
+          onClick={() => setShowQR(true)}
+          className="absolute inset-0 bg-black/40 text-white text-sm rounded flex items-center justify-center"
+        >
+          View QR
+        </button>
+      )}
+    </div>
+
+    <p className="text-xs text-gray-500 text-center">
+      Click to view payment QR
+    </p>
+  </div>
+</div>
+
 
           <button
             type="submit"

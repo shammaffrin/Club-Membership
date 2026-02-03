@@ -7,22 +7,26 @@ import MemberDashboard from "./components/MembershipDashboard";
 import UserList from "./components/UserList";
 import AdminLogin from "./components/AdminLogin";
 import MembershipCard from "./pages/MemberCard";
-
+import Footer from "./components/footer";
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<MemberRegister />} />
-        <Route path="/upload-payment" element={<UploadPayment />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<MemberDashboard />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/users" element={<UserList />} />
+      <div className="min-h-screen flex flex-col">
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<MemberRegister />} />
+            <Route path="/upload-payment" element={<UploadPayment />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/dashboard" element={<MemberDashboard />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/users" element={<UserList />} />
+            <Route path="/member" element={<MembershipCard />} />
+          </Routes>
+        </div>
 
-        {/* MEMBERSHIP CARD */}
-        <Route path="/member" element={<MembershipCard />} />
-      </Routes>
+        <Footer/>
+      </div>
     </Router>
   );
 }
