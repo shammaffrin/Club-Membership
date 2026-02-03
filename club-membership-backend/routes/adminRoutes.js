@@ -4,6 +4,35 @@ import adminAuth from "../middleware/adminauth.js"; // import your middleware
 
 const router = express.Router();
 
+router.post("/login", (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (
+      username !== process.env.ADMIN_USERNAME ||
+      password !== process.env.ADMIN_PASSWORD
+    ) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { role: "admin", username },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.status(200).json({
+      success: true,
+      token,
+      admin: { username }
+    });
+  } catch (error) {
+    console.error("Admin login error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+
 /* =========================
    GET ALL PENDING USERS
 ========================= */
