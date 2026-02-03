@@ -1,9 +1,13 @@
 import express from "express";
+import jwt from "jsonwebtoken"; // ← added import
 import User from "../models/User.js";
-import adminAuth from "../middleware/adminauth.js"; // import your middleware
+import adminAuth from "../middleware/adminauth.js"; // your middleware
 
 const router = express.Router();
 
+/* =========================
+   ADMIN LOGIN
+========================= */
 router.post("/login", (req, res) => {
   try {
     const { username, password } = req.body;
@@ -32,7 +36,6 @@ router.post("/login", (req, res) => {
   }
 });
 
-
 /* =========================
    GET ALL PENDING USERS
 ========================= */
@@ -41,15 +44,10 @@ router.get("/pending-users", adminAuth, async (req, res) => {
     const users = await User.find({ membershipStatus: "pending_approval" })
       .sort({ createdAt: -1 });
 
-    res.status(200).json({
-      success: true,
-      users,
-    });
+    res.status(200).json({ success: true, users });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    console.error("Pending users error:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -62,13 +60,9 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
     const user = await User.findById(id);
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // 🔒 IMPORTANT CHECK (NO IMAGE = NO APPROVAL)
     if (!user.photo || !user.paymentScreenshot) {
       return res.status(400).json({
         success: false,
@@ -90,21 +84,12 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
 
     await user.save();
 
-    res.status(200).json({
-      success: true,
-      user,
-    });
+    res.status(200).json({ success: true, user });
   } catch (error) {
-    console.error("Approve route error:", error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    console.error("Approve user error:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
-
-
-
 
 /* =========================
    REJECT USER
@@ -114,24 +99,16 @@ router.put("/reject/:id", adminAuth, async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ success: false, message: "User not found" });
     }
 
     user.membershipStatus = "rejected";
     await user.save();
 
-    res.status(200).json({
-      success: true,
-      user,
-    });
+    res.status(200).json({ success: true, user });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    console.error("Reject user error:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -141,16 +118,10 @@ router.put("/reject/:id", adminAuth, async (req, res) => {
 router.get("/all-users", adminAuth, async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
-
-    res.status(200).json({
-      success: true,
-      users,
-    });
+    res.status(200).json({ success: true, users });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    console.error("All users error:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
