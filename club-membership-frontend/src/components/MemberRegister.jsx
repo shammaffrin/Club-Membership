@@ -171,7 +171,7 @@ export default function MemberRegister() {
 
             <input
               name="nickname"
-              placeholder="Nickname"
+              placeholder="Nickname / അറിയപ്പെടുന്ന പേര്"
               onChange={handleChange}
               className="p-2 border rounded-lg w-full border-gray-300"
             />
@@ -182,7 +182,7 @@ export default function MemberRegister() {
             <div>
               <input
                 name="email"
-                placeholder="Email (optional)"
+                placeholder="Email(optional)/ ഇ മെയില്‍ ഐഡി"
                 onChange={handleChange}
                 className={inputClass("email")}
               />
@@ -192,7 +192,7 @@ export default function MemberRegister() {
             <div>
               <input
                 name="phone"
-                placeholder="Mobile Number"
+                placeholder="Mobile Number/മൊബൈല്‍ നമ്പര്‍"
                 onChange={handleChange}
                 className={inputClass("phone")}
               />

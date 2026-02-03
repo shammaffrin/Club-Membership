@@ -9,9 +9,6 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
 
-  const [editingUser, setEditingUser] = useState(null);
-  const [editLoading, setEditLoading] = useState(false);
-
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
 
@@ -20,37 +17,45 @@ export default function AdminPage() {
   };
 
   const fetchUsers = async () => {
+    if (!token) {
+      navigate("/admin-login");
+      return;
+    }
+
     try {
       setLoading(true);
+      setError("");
       const res = await axios.get(
         "https://club-membership.vercel.app/api/admin/pending-users",
         authHeader
       );
       setUsers(res.data.users || []);
     } catch (err) {
-      setError(err.response?.data?.message || "Error fetching users");
-      if (err.response?.status === 401) navigate("/admin-login");
+      console.error(err);
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        localStorage.removeItem("adminToken");
+        navigate("/admin-login");
+      } else {
+        setError(err.response?.data?.message || "Error fetching users");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (!token) navigate("/admin-login");
-    else fetchUsers();
-  }, [token]);
-
   const approveUser = async (id) => {
     try {
       setActionLoading(id);
-      await axios.put(
+      setError("");
+      const res = await axios.put(
         `https://club-membership.vercel.app/api/admin/approve/${id}`,
         {},
         authHeader
       );
+      alert(`User approved! Membership ID: ${res.data.user.membershipId}`);
       fetchUsers();
     } catch (err) {
-      setError(err.response?.data?.message || "Approve failed");
+      setError(err.response?.data?.message || "Error approving user");
     } finally {
       setActionLoading(null);
     }
@@ -59,6 +64,7 @@ export default function AdminPage() {
   const rejectUser = async (id) => {
     try {
       setActionLoading(id);
+      setError("");
       await axios.put(
         `https://club-membership.vercel.app/api/admin/reject/${id}`,
         {},
@@ -66,179 +72,170 @@ export default function AdminPage() {
       );
       fetchUsers();
     } catch (err) {
-      setError(err.response?.data?.message || "Reject failed");
+      setError(err.response?.data?.message || "Error rejecting user");
     } finally {
       setActionLoading(null);
     }
   };
 
-  const updateUser = async () => {
-    try {
-      setEditLoading(true);
-      await axios.put(
-        `https://club-membership.vercel.app/api/admin/user/${editingUser._id}`,
-        {
-          name: editingUser.name,
-          phone: editingUser.phone,
-          email: editingUser.email,
-          address: editingUser.address,
-          dob: editingUser.dob,
-          bloodGroup: editingUser.bloodGroup,
-          gender: editingUser.gender,
-        },
-        authHeader
-      );
-
-      alert("User updated successfully");
-      setEditingUser(null);
-      fetchUsers();
-    } catch (err) {
-      setError(err.response?.data?.message || "Update failed");
-    } finally {
-      setEditLoading(false);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    navigate("/admin-login");
   };
 
-  const formatDate = (date) =>
-    date
-      ? new Date(date).toLocaleDateString("en-GB")
-      : "—";
+  useEffect(() => {
+    if (!token) navigate("/admin-login");
+    else fetchUsers();
+  }, [token]);
+
+  const formatDate = (date) => {
+  if (!date) return "—";
+  return new Date(date).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+};
+
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-6">Pending Users</h1>
-
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-
-      {loading ? (
-        <p>Loading...</p>
-      ) : users.length === 0 ? (
-        <p>No pending users</p>
-      ) : (
-        <div className="space-y-4">
-          {users.map((user) => (
-            <div
-              key={user._id}
-              className="bg-white rounded-xl shadow p-4 flex flex-col md:flex-row gap-4"
-            >
-              <img
-                src={user.photo || "/no-user.png"}
-                alt=""
-                onClick={() => setPreviewImage(user.photo)}
-                className="w-20 h-20 rounded-full object-cover cursor-pointer"
-              />
-
-              <div className="flex-1 text-sm space-y-1">
-                <p><b>Name:</b> {user.name}</p>
-                <p><b>Phone:</b> {user.phone}</p>
-                <p><b>Email:</b> {user.email || "—"}</p>
-                <p><b>Blood:</b> {user.bloodGroup}</p>
-                <p><b>DOB:</b> {formatDate(user.dob)}</p>
-                <p><b>Address:</b> {user.address}</p>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  onClick={() => approveUser(user._id)}
-                  className="bg-green-600 text-white px-4 py-2 rounded"
-                >
-                  Approve
-                </button>
-
-                <button
-                  onClick={() => rejectUser(user._id)}
-                  className="bg-red-600 text-white px-4 py-2 rounded"
-                >
-                  Reject
-                </button>
-
-                <button
-                  onClick={() => setEditingUser(user)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded"
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-          ))}
+    <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
+      {/* Sidebar */}
+      <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col">
+        <div className="px-6 py-4 text-2xl font-bold border-b">
+          Admin Panel
         </div>
-      )}
 
-      {/* EDIT MODAL */}
-      {editingUser && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-lg">
-            <h2 className="text-xl font-bold mb-4">Edit User</h2>
+        <nav className="flex-1 p-4 space-y-2">
+          <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200">
+            Dashboard
+          </button>
+          <button
+            onClick={() => navigate("/users")}
+            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
+          >
+            Users
+          </button>
+          <button
+          onClick={handleLogout}
+          className="m-4 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+        >
+          Logout
+        </button>
+        </nav>
+      </aside>
 
-            <div className="grid grid-cols-2 gap-3">
-              <input
-                value={editingUser.name}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, name: e.target.value })
-                }
-                placeholder="Name"
-                className="border p-2 rounded"
-              />
-              <input
-                value={editingUser.phone}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, phone: e.target.value })
-                }
-                placeholder="Phone"
-                className="border p-2 rounded"
-              />
-              <input
-                value={editingUser.email || ""}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, email: e.target.value })
-                }
-                placeholder="Email"
-                className="border p-2 rounded"
-              />
-              <input
-                value={editingUser.bloodGroup || ""}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, bloodGroup: e.target.value })
-                }
-                placeholder="Blood Group"
-                className="border p-2 rounded"
-              />
-              <input
-                type="date"
-                value={editingUser.dob?.slice(0, 10) || ""}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, dob: e.target.value })
-                }
-                className="border p-2 rounded"
-              />
-              <input
-                value={editingUser.address || ""}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, address: e.target.value })
-                }
-                placeholder="Address"
-                className="border p-2 rounded col-span-2"
-              />
-            </div>
+      {/* Main */}
+      <main className="flex-1 p-4 md:p-6">
+        <h1 className="text-3xl font-bold mb-6">Pending Approvals</h1>
 
-            <div className="flex justify-end gap-3 mt-4">
-              <button
-                onClick={() => setEditingUser(null)}
-                className="px-4 py-2 bg-gray-300 rounded"
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+        {loading ? (
+          <p className="text-center text-gray-500 text-lg">
+            Loading users...
+          </p>
+        ) : users.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg">
+            No pending users
+          </p>
+        ) : (
+          <div className="space-y-6">
+            {users.map((user) => (
+              <div
+                key={user._id}
+                className="bg-white shadow rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
               >
-                Cancel
-              </button>
+                {/* Photo */}
+                <img
+                  src={user.photo || "/no-user.png"}
+                  alt={user.name}
+                  onClick={() => setPreviewImage(user.photo)}
+                  onError={(e) => (e.target.src = "/no-user.png")}
+                  className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+                />
+
+                {/* Details */}
+               <div className="flex-1 space-y-1 text-sm md:text-base">
+  <p><b>Name:</b> {user.name}</p>
+  <p><b>Father Name:</b> {user.fatherName || "—"}</p>
+  <p><b>Nickname:</b> {user.nickname}</p>
+  <p><b>Email:</b> {user.email || "—"}</p>
+  <p><b>Phone:</b> {user.phone}</p>
+  <p><b>Blood Group:</b> {user.bloodGroup}</p>
+  <p><b>Address:</b> {user.address}</p>
+  <p><b>DOB:</b> {formatDate(user.dob)}</p>
+  <p><b>Valid Upto:</b> {user.expiryDate}</p>
+
+  {user.paymentProof && (
+    <a
+      href={user.paymentProof}
+      target="_blank"
+      rel="noreferrer"
+      className="text-blue-600 text-sm"
+    >
+      View Payment Proof
+    </a>
+  )}
+</div>
+
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => approveUser(user._id)}
+                    disabled={actionLoading === user._id}
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      actionLoading === user._id
+                        ? "bg-green-400"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
+                  >
+                    {actionLoading === user._id ? "Processing..." : "Approve"}
+                  </button>
+
+                  <button
+                    onClick={() => rejectUser(user._id)}
+                    disabled={actionLoading === user._id}
+                    className={`px-4 py-2 rounded-lg text-white ${
+                      actionLoading === user._id
+                        ? "bg-red-400"
+                        : "bg-red-600 hover:bg-red-700"
+                    }`}
+                  >
+                    {actionLoading === user._id ? "Processing..." : "Reject"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* IMAGE PREVIEW MODAL */}
+        {previewImage && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+            onClick={() => setPreviewImage(null)}
+          >
+            <div
+              className="relative max-w-[90%] max-h-[90%]"
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
-                onClick={updateUser}
-                disabled={editLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                onClick={() => setPreviewImage(null)}
+                className="absolute -top-4 -right-4 bg-white rounded-full px-3 py-1 text-lg font-bold shadow"
               >
-                {editLoading ? "Saving..." : "Save"}
+                ✕
               </button>
+
+              <img
+                src={previewImage}
+                alt="User Full"
+                className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
+              />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
-}
+}   
