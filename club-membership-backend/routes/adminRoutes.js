@@ -125,4 +125,57 @@ router.get("/all-users", adminAuth, async (req, res) => {
   }
 });
 
+/* =========================
+   EDIT / UPDATE USER DETAILS
+========================= */
+router.put("/user/:id", adminAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Whitelist fields admin is allowed to edit
+    const allowedUpdates = [
+      "name",
+      "phone",
+      "email",
+      "address",
+      "dob",
+      "bloodGroup",
+      "gender",
+    ];
+
+    const updates = {};
+    allowedUpdates.forEach((field) => {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      updates,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Edit user error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+
 export default router;
