@@ -63,7 +63,7 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    if (!user.photo || !user.paymentScreenshot) {
+    if (!user.photo || !user.paymentProof) {
       return res.status(400).json({
         success: false,
         message: "Profile photo and payment proof are required before approval",
