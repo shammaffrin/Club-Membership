@@ -29,9 +29,9 @@ const getNextMembershipId = async () => {
 router.post(
   "/register",
   upload.fields([
-    { name: "photo", maxCount: 1 },
-    { name: "paymentScreenshot", maxCount: 1 },
-  ]),
+  { name: "photo", maxCount: 1 },
+  { name: "paymentProof", maxCount: 1 },
+]),
   async (req, res) => {
     try {
       const {
@@ -64,12 +64,11 @@ router.post(
         });
       }
 
-      if (!req.files?.photo || !req.files?.paymentScreenshot) {
-        return res.status(400).json({
-          success: false,
-          message: "Photo and payment proof are required",
-        });
-      }
+     if (!req.files?.photo || !req.files?.paymentProof) {
+  return res.status(400).json({ message: "Photo and payment proof are required" });
+}
+
+         
 
       /* ======================
          DUPLICATE PHONE CHECK
@@ -105,8 +104,9 @@ router.post(
         photo: req.files.photo[0].path,
         photoId: req.files.photo[0].filename,
 
-        paymentProof: req.files.paymentScreenshot[0].path,
-        paymentProofId: req.files.paymentScreenshot[0].filename,
+        paymentProof: req.files.paymentProof[0].path,
+paymentProofId: req.files.paymentProof[0].filename,
+
       });
 
       res.status(201).json({

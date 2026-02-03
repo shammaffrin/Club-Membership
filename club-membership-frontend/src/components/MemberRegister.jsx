@@ -89,7 +89,7 @@ export default function MemberRegister() {
       const data = new FormData();
       Object.entries(formData).forEach(([k, v]) => v && data.append(k, v));
       data.append("photo", photo);
-      data.append("paymentScreenshot", paymentScreenshot);
+      data.append("paymentProof", paymentScreenshot);
 
       await axios.post(
         "https://club-membership.vercel.app/api/auth/register",
