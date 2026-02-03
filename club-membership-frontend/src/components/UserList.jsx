@@ -119,14 +119,13 @@ export default function AdminUserList() {
           >
             Users
           </button>
-        </nav>
-
-        <button
+          <button
           onClick={handleLogout}
-          className="m-4 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
         >
           Logout
         </button>
+        </nav>
       </aside>
 
       {/* Main Content */}

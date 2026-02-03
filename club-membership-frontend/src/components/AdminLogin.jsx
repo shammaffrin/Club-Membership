@@ -1,10 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -16,10 +18,9 @@ export default function AdminLogin() {
 
     try {
       const res = await axios.post(
-  "https://club-membership.vercel.app/api/admin/login",
-  { username: username.trim(), password }
-);
-
+        "https://club-membership.vercel.app/api/admin/login",
+        { username: username.trim(), password }
+      );
 
       if (res.data.token) {
         localStorage.setItem("adminToken", res.data.token);
@@ -28,7 +29,6 @@ export default function AdminLogin() {
         setError("Login failed: No token received");
       }
     } catch (err) {
-      console.error("Login error:", err.response?.data);
       setError(err.response?.data?.message || "Invalid admin credentials");
     } finally {
       setLoading(false);
@@ -54,20 +54,32 @@ export default function AdminLogin() {
           required
         />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border p-3 rounded-lg mb-6"
-          required
-        />
+        {/* Password with eye */}
+        <div className="relative mb-6">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border p-3 rounded-lg pr-10"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
 
         <button
           type="submit"
           disabled={loading}
           className={`w-full py-3 rounded-lg text-white ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
           }`}
         >
           {loading ? "Logging in..." : "Login"}
