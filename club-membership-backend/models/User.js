@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema(
 
     bloodGroup: {
       type: String,
-      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-" , "Nil"],
       required: true,
       trim: true,
     },
@@ -52,12 +52,21 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
-    phone: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
+   phone: {
+  type: String,
+  required: true,
+  unique: true,
+  trim: true,
+  match: [/^(?:\+91)?[6-9]\d{9}$/, "Invalid phone number"],
+},
+
+whatsapp: {
+  type: String,
+  required: true,
+  trim: true,
+  match: [/^(?:\+91)?[6-9]\d{9}$/, "Invalid WhatsApp number"],
+},
+
 
     /* ======================
        CLOUDINARY PROFILE PHOTO

@@ -89,25 +89,27 @@ export default function AdminPage() {
   }, [token]);
 
   const formatDate = (date) => {
-  if (!date) return "—";
-  return new Date(date).toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-};
-
+    if (!date) return "—";
+    return new Date(date).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col">
-        <div className="px-6 py-4 text-2xl font-bold border-b">
+       <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col flex-row md:min-h-screen">
+        <div className="px-4 py-3 md:px-6 md:py-4 text-xl md:text-2xl font-bold border-b">
           Admin Panel
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
-          <button className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200">
+        <nav className="flex-1 px-2 py-3 md:px-4 md:py-6 flex md:block gap-2 md:space-y-2">
+          <button
+            onClick={() => navigate("/admin")}
+            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
+          >
             Dashboard
           </button>
           <button
@@ -118,7 +120,7 @@ export default function AdminPage() {
           </button>
           <button
           onClick={handleLogout}
-          className="m-4 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
         >
           Logout
         </button>
@@ -126,25 +128,25 @@ export default function AdminPage() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-4 md:p-6">
-        <h1 className="text-3xl font-bold mb-6">Pending Approvals</h1>
+      <main className="flex-1 p-4 md:p-6 overflow-x-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center md:text-left">
+          Pending Approvals
+        </h1>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && (
+          <p className="text-red-500 mb-4 text-center md:text-left">{error}</p>
+        )}
 
         {loading ? (
-          <p className="text-center text-gray-500 text-lg">
-            Loading users...
-          </p>
+          <p className="text-center text-gray-500 text-lg">Loading users...</p>
         ) : users.length === 0 ? (
-          <p className="text-center text-gray-500 text-lg">
-            No pending users
-          </p>
+          <p className="text-center text-gray-500 text-lg">No pending users</p>
         ) : (
           <div className="space-y-6">
             {users.map((user) => (
               <div
                 key={user._id}
-                className="bg-white shadow rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
+                className="bg-white shadow rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center"
               >
                 {/* Photo */}
                 <img
@@ -156,31 +158,32 @@ export default function AdminPage() {
                 />
 
                 {/* Details */}
-               <div className="flex-1 space-y-1 text-sm md:text-base">
-  <p><b>Name:</b> {user.name}</p>
-  <p><b>Father Name:</b> {user.fatherName || "—"}</p>
-  <p><b>Nickname:</b> {user.nickname}</p>
-  <p><b>Email:</b> {user.email || "—"}</p>
-  <p><b>Phone:</b> {user.phone}</p>
-  <p><b>Blood Group:</b> {user.bloodGroup}</p>
-  <p><b>Address:</b> {user.address}</p>
-  <p><b>DOB:</b> {formatDate(user.dob)}</p>
-  <p><b>Valid Upto:</b> {user.expiryDate}</p>
+                <div className="flex-1 space-y-1 text-sm sm:text-base overflow-x-auto">
+                  <p><b>Name:</b> {user.name}</p>
+                  <p><b>Father Name:</b> {user.fatherName || "—"}</p>
+                  <p><b>Nickname:</b> {user.nickname}</p>
+                  <p><b>Email:</b> {user.email || "—"}</p>
+                  <p><b>Phone:</b> {user.phone}</p>
+                  <p><b>WhatsApp:</b> {user.Whatsapp}</p>
+                  <p><b>Blood Group:</b> {user.bloodGroup}</p>
+                  <p><b>Address:</b> {user.address}</p>
+                  <p><b>DOB:</b> {formatDate(user.dob)}</p>
+                  <p><b>Valid Upto:</b> {user.expiryDate}</p>
 
-  {user.paymentProof && (
-    <a
-      href={user.paymentProof}
-      target="_blank"
-      rel="noreferrer"
-      className="text-blue-600 text-sm"
-    >
-      View Payment Proof
-    </a>
-  )}
-</div>
+                  {user.paymentProof && (
+                    <a
+                      href={user.paymentProof}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600 text-sm"
+                    >
+                      View Payment Proof
+                    </a>
+                  )}
+                </div>
 
                 {/* Actions */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap mt-2 sm:mt-0">
                   <button
                     onClick={() => approveUser(user._id)}
                     disabled={actionLoading === user._id}
@@ -213,7 +216,7 @@ export default function AdminPage() {
         {/* IMAGE PREVIEW MODAL */}
         {previewImage && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-2"
             onClick={() => setPreviewImage(null)}
           >
             <div
@@ -238,4 +241,4 @@ export default function AdminPage() {
       </main>
     </div>
   );
-}   
+}

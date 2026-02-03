@@ -11,16 +11,18 @@ import Qr from "../assets/qr.jpeg"
 
 export default function MemberRegister() {
   const [formData, setFormData] = useState({
-    name: "",
-    fatherName: "",
-    nickname: "",
-    age: "",
-    phone: "",
-    email: "",
-    bloodGroup: "",
-    address: "",
-    dob: "",
-  });
+  name: "",
+  fatherName: "",
+  nickname: "",
+  age: "",
+  phone: "",
+  Whatsapp: "",
+  email: "",
+  bloodGroup: "",
+  address: "",
+  dob: "",
+});
+
 
   const [photo, setPhoto] = useState(null);
   const [paymentScreenshot, setPaymentScreenshot] = useState(null);
@@ -160,59 +162,75 @@ export default function MemberRegister() {
           className={`space-y-4 ${loading ? "pointer-events-none opacity-70" : ""}`}
         >
           {/* Name + Nickname */}
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div>
-              <input
-                name="name"
-                placeholder="Full Name/മുഴുവൻ പേര്"
-                onChange={handleChange}
-                className={`${inputClass("name")} placeholder:text-[11px]`}
-              />
-              {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
-            </div>
+          {/* Name + Nickname + Father Name */}
+<div className="grid sm:grid-cols-3 gap-3">
+  <div>
+    <input
+      name="name"
+      placeholder="Full Name/മുഴുവൻ പേര്"
+      onChange={handleChange}
+      className={`${inputClass("name")} placeholder:text-[11px]`}
+    />
+    {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+  </div>
 
-            <input
-              name="nickname"
-              placeholder="Nickname / അറിയപ്പെടുന്ന പേര്"
-              onChange={handleChange}
-              className="p-2 border rounded-lg w-full placeholder:text-[11px] border-gray-300"
-            />
-          </div>
+  <input
+    name="nickname"
+    placeholder="Nickname / അറിയപ്പെടുന്ന പേര്"
+    onChange={handleChange}
+    className="p-2 border rounded-lg w-full placeholder:text-[11px] border-gray-300"
+  />
+
+  <div>
+    <input
+      name="fatherName"
+      placeholder="Father Name/പിതാവിന്റെ പേര്"
+      onChange={handleChange}
+      className={`${inputClass("fatherName")} placeholder:text-[11px]`}
+    />
+    {errors.fatherName && (
+      <p className="text-red-500 text-xs">{errors.fatherName}</p>
+    )}
+  </div>
+</div>
+
 
           {/* Email + Phone + Father Name */}
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div>
-              <input
-                name="email"
-                placeholder="Email(optional)/ ഇ മെയില്‍ ഐഡി"
-                onChange={handleChange}
-                className={`${inputClass("email")} placeholder:text-[11px]`}
-              />
-              {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
-            </div>
+         {/* Email + Mobile + WhatsApp */}
+<div className="grid sm:grid-cols-3 gap-3">
+  <div>
+    <input
+      name="email"
+      placeholder="Email(optional)/ ഇ മെയില്‍ ഐഡി"
+      onChange={handleChange}
+      className={`${inputClass("email")} placeholder:text-[11px]`}
+    />
+    {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+  </div>
 
-            <div>
-              <input
-                name="phone"
-                placeholder="Mobile Number/മൊബൈല്‍ നമ്പര്‍"
-                onChange={handleChange}
-                className={`${inputClass("phone")} placeholder:text-[11px]`}
-              />
-              {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
-            </div>
+  <div>
+    <input
+      name="phone"
+      placeholder="Mobile Number/മൊബൈല്‍ നമ്പര്‍"
+      onChange={handleChange}
+      className={`${inputClass("phone")} placeholder:text-[11px]`}
+    />
+    {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+  </div>
 
-            <div>
-              <input
-                name="fatherName"
-                placeholder="Father Name/പിതാവിന്റെ പേര്"
-                onChange={handleChange}
-                className={`${inputClass("fatherName")} placeholder:text-[11px]`}
-              />
-              {errors.fatherName && (
-                <p className="text-red-500 text-xs">{errors.fatherName}</p>
-              )}
-            </div>
-          </div>
+  <div>
+    <input
+      name="Whatsapp"
+      placeholder="WhatsApp Number"
+      onChange={handleChange}
+      className={`${inputClass("Whatsapp")} placeholder:text-[11px]`}
+    />
+    {errors.Whatsapp && (
+      <p className="text-red-500 text-xs">{errors.Whatsapp}</p>
+    )}
+  </div>
+</div>
+
 
           {/* Age + DOB + Blood Group */}
           <div className="grid sm:grid-cols-3 gap-3">

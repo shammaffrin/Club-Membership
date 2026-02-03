@@ -33,18 +33,19 @@ const getNextMembershipId = async () => {
 router.post(
   "/register",
   upload.fields([
-  { name: "photo", maxCount: 1 },
-  { name: "paymentProof", maxCount: 1 },
-]),
+    { name: "photo", maxCount: 1 },
+    { name: "paymentProof", maxCount: 1 },
+  ]),
   async (req, res) => {
     try {
       const {
         name,
-        fatherName,          // ✅ ADDED
+        fatherName,
         nickname,
         email,
         age,
         phone,
+        Whatsapp,
         bloodGroup,
         address,
         dob,
@@ -55,10 +56,11 @@ router.post(
       ====================== */
       if (
         !name ||
-        !fatherName ||       // ✅ REQUIRED
+        !fatherName ||
         !nickname ||
         !age ||
         !phone ||
+        !Whatsapp ||
         !bloodGroup ||
         !address
       ) {
@@ -68,20 +70,41 @@ router.post(
         });
       }
 
-     if (!req.files?.photo || !req.files?.paymentProof) {
-  return res.status(400).json({ message: "Photo and payment proof are required" });
-}
-
-         
+      if (!req.files?.photo || !req.files?.paymentProof) {
+        return res.status(400).json({
+          message: "Photo and payment proof are required",
+        });
+      }
 
       /* ======================
-         DUPLICATE PHONE CHECK
+         PHONE / WHATSAPP VALIDATION
       ====================== */
-      const existingUser = await User.findOne({ phone });
+      const phoneRegex = /^(?:\+91)?[6-9]\d{9}$/;
+
+      if (!phoneRegex.test(phone) || !phoneRegex.test(Whatsapp)) {
+        return res.status(400).json({
+          success: false,
+          message: "Enter valid phone and WhatsApp numbers",
+        });
+      }
+
+      /* ======================
+         BLOOD GROUP NORMALIZE
+      ====================== */
+      const normalizedBloodGroup =
+        bloodGroup.toUpperCase() === "NIL" ? "Nil" : bloodGroup;
+
+      /* ======================
+         DUPLICATE CHECKS
+      ====================== */
+      const existingUser = await User.findOne({
+        $or: [{ phone }, { Whatsapp }],
+      });
+
       if (existingUser) {
         return res.status(409).json({
           success: false,
-          message: "Phone already exists",
+          message: "Phone or WhatsApp already exists",
         });
       }
 
@@ -92,25 +115,24 @@ router.post(
       ====================== */
       const user = await User.create({
         name,
-        fatherName,          // ✅ SAVED
+        fatherName,
         nickname,
         email: email || null,
         age,
         phone,
-        bloodGroup,
+        Whatsapp,
+        bloodGroup: normalizedBloodGroup,
         address,
         dob: dob || null,
 
         membershipId,
         membershipStatus: "pending_approval",
 
-        // Cloudinary uploads
         photo: req.files.photo[0].path,
         photoId: req.files.photo[0].filename,
 
         paymentProof: req.files.paymentProof[0].path,
-paymentProofId: req.files.paymentProof[0].filename,
-
+        paymentProofId: req.files.paymentProof[0].filename,
       });
 
       res.status(201).json({

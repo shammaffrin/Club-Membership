@@ -36,21 +36,23 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-xl shadow-lg w-96"
+        className="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold text-center mb-6">Admin Login</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-center mb-6">
+          Admin Login
+        </h2>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full border p-3 rounded-lg mb-4"
+          className="w-full border p-3 rounded-lg mb-4 text-sm sm:text-base"
           required
         />
 
@@ -61,7 +63,7 @@ export default function AdminLogin() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border p-3 rounded-lg pr-10"
+            className="w-full border p-3 rounded-lg pr-10 text-sm sm:text-base"
             required
           />
           <button
@@ -76,7 +78,7 @@ export default function AdminLogin() {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-3 rounded-lg text-white ${
+          className={`w-full py-3 rounded-lg text-white text-sm sm:text-base ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-indigo-600 hover:bg-indigo-700"
