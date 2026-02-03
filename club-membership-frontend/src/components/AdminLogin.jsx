@@ -16,9 +16,10 @@ export default function AdminLogin() {
 
     try {
       const res = await axios.post(
-        "https://club-membership.vercel.app/api/auth/admin/login",
-        { username: username.trim(), password }
-      );
+  "https://club-membership.vercel.app/api/admin/login",
+  { username: username.trim(), password }
+);
+
 
       if (res.data.token) {
         localStorage.setItem("adminToken", res.data.token);
