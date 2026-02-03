@@ -7,7 +7,7 @@ import MemberDashboard from "./components/MembershipDashboard";
 import UserList from "./components/UserList";
 import AdminLogin from "./components/AdminLogin";
 import MembershipCard from "./pages/MemberCard";
-import Footer from "./components/footer";
+// import Footer from "./components/footer";
 function App() {
   return (
     <Router>
@@ -25,7 +25,7 @@ function App() {
           </Routes>
         </div>
 
-        <Footer/>
+
       </div>
     </Router>
   );

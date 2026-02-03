@@ -9,19 +9,23 @@ const router = express.Router();
    MEMBERSHIP ID GENERATOR
 ====================== */
 const getNextMembershipId = async () => {
-  const lastUser = await User.findOne().sort({ createdAt: -1 });
+  const lastUser = await User.findOne({
+    membershipId: { $regex: "^K-STAR2026/" }
+  }).sort({ createdAt: -1 });
+
   let nextNumber = 1;
 
   if (lastUser?.membershipId) {
     const lastNumber = parseInt(
-      lastUser.membershipId.replace("KSASC", ""),
+      lastUser.membershipId.split("/")[1],
       10
     );
     nextNumber = lastNumber + 1;
   }
 
-  return `KSASC${String(nextNumber).padStart(4, "0")}`;
+  return `K-STAR2026/${String(nextNumber).padStart(4, "0")}`;
 };
+
 
 /* ======================
    REGISTER (WITH PHOTO + PAYMENT)
