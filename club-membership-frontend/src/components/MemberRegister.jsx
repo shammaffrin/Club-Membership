@@ -7,7 +7,7 @@ import Lines from "../assets/lines.webp";
 import CenterLogo from "../assets/logo-Malayalam.webp";
 import ClubName from "../assets/logo.webp";
 import Hashtag from "../assets/hashtag.webp";
-import Qr from "../assets/qr.jpeg"
+import Qr from "../assets/qr.jpeg";
 
 export default function MemberRegister() {
   const [formData, setFormData] = useState({
@@ -25,19 +25,16 @@ export default function MemberRegister() {
     whatsapp: "",
   });
 
-
-
- const countryCodes = [
-  { code: "+91", label: "IN" },
-  { code: "+971", label: "UAE" },
-  { code: "+974", label: "Qatar" },
-  { code: "+966", label: "Saudi" },
-  { code: "+973", label: "Bahrain" },
-  { code: "+965", label: "Kuwait" },
-  { code: "+968", label: "Oman" },
-  { code: "+44", label: "UK" },
-];
-
+  const countryCodes = [
+    { code: "+91", label: "IN" },
+    { code: "+971", label: "UAE" },
+    { code: "+974", label: "Qatar" },
+    { code: "+966", label: "Saudi" },
+    { code: "+973", label: "Bahrain" },
+    { code: "+965", label: "Kuwait" },
+    { code: "+968", label: "Oman" },
+    { code: "+44", label: "UK" },
+  ];
 
   const [photo, setPhoto] = useState(null);
   const [sameAsPhone, setSameAsPhone] = useState(true);
@@ -48,14 +45,14 @@ export default function MemberRegister() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const phoneRegex = /^\d{10}$/;
 
-
   const navigate = useNavigate();
 
   /* ======================
      HELPERS
   ====================== */
   const inputClass = (field) =>
-    `p-2 border rounded-lg w-full ${errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
+    `p-2 border rounded-lg w-full ${
+      errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
     }`;
 
   const handleChange = (e) => {
@@ -72,14 +69,12 @@ export default function MemberRegister() {
       updatedForm.whatsappCode = value;
     }
 
-
     setFormData(updatedForm);
 
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
   };
-
 
   const compressImage = async (file) =>
     await imageCompression(file, { maxSizeMB: 0.4, maxWidthOrHeight: 900 });
@@ -108,7 +103,6 @@ export default function MemberRegister() {
     if (!formData.nickname || formData.nickname.trim().length < 2)
       newErrors.nickname = "Nickname is required";
 
-
     if (!formData.fatherName || formData.fatherName.trim().length < 3)
       newErrors.fatherName = "Father name is required";
 
@@ -121,23 +115,17 @@ export default function MemberRegister() {
     if (!formData.age || Number(formData.age) < 1)
       newErrors.age = "Enter a valid age";
 
-
     if (!formData.bloodGroup)
       newErrors.bloodGroup = "Please select blood group";
 
-    if (!formData.address.trim())
-      newErrors.address = "Address is required";
+    if (!formData.address.trim()) newErrors.address = "Address is required";
 
-    const whatsappNumber = sameAsPhone
-      ? formData.phone
-      : formData.whatsapp;
+    const whatsappNumber = sameAsPhone ? formData.phone : formData.whatsapp;
 
     if (!phoneRegex.test(whatsappNumber))
       newErrors.whatsapp = "Invalid WhatsApp number";
 
-
-    if (!photo)
-      newErrors.photo = "Profile photo is required";
+    if (!photo) newErrors.photo = "Profile photo is required";
 
     if (!paymentScreenshot)
       newErrors.payment = "Payment screenshot is required";
@@ -171,11 +159,7 @@ export default function MemberRegister() {
       // PHONE (with country code)
       data.append("phone", formData.phone);
 
-      data.append(
-        "whatsapp",
-        sameAsPhone ? formData.phone : formData.whatsapp
-      );
-
+      data.append("whatsapp", sameAsPhone ? formData.phone : formData.whatsapp);
 
       // FILES
       data.append("photo", photo);
@@ -184,7 +168,7 @@ export default function MemberRegister() {
       await axios.post(
         "https://club-membership.vercel.app/api/auth/register",
         data,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       setShowSuccessModal(true);
@@ -194,7 +178,6 @@ export default function MemberRegister() {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4 sm:px-6">
@@ -212,15 +195,15 @@ export default function MemberRegister() {
           <img src={ClubName} className="h-16" />
         </div>
 
-
         <h1 className="text-center text-xl sm:text-2xl font-extrabold mb-4">
           MEMBER REGISTRATION
         </h1>
 
         <form
           onSubmit={handleSubmit}
-          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${loading ? "pointer-events-none opacity-70" : ""
-            }`}
+          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${
+            loading ? "pointer-events-none opacity-70" : ""
+          }`}
         >
           {/* ================= PERSONAL DETAILS ================= */}
           <div className="space-y-5">
@@ -234,7 +217,9 @@ export default function MemberRegister() {
               onChange={handleChange}
               className={`${inputClass("name")} placeholder:text-[11px]`}
             />
-            {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs">{errors.name}</p>
+            )}
 
             <div>
               <input
@@ -249,117 +234,126 @@ export default function MemberRegister() {
             </div>
 
             <input
-            name="fatherName"
-            placeholder="Father Name / പിതാവിന്റെ പേര്"
-            onChange={handleChange}
-            className={`${inputClass("fatherName")} placeholder:text-[11px]`}
-          />
-          {errors.fatherName && (
-            <p className="text-red-500 text-xs">{errors.fatherName}</p>
-          )}
-
+              name="fatherName"
+              placeholder="Father Name / പിതാവിന്റെ പേര്"
+              onChange={handleChange}
+              className={`${inputClass("fatherName")} placeholder:text-[11px]`}
+            />
+            {errors.fatherName && (
+              <p className="text-red-500 text-xs">{errors.fatherName}</p>
+            )}
           </div>
 
-   <div className="space-y-5">
-  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
-    Contact Details
-  </h3>
+          <div className="space-y-5">
+            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+              Contact Details
+            </h3>
 
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    {/* Email */}
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-gray-700">Email (optional)</label>
-      <input
-        name="email"
-        placeholder="example@mail.com"
-        onChange={handleChange}
-        className={`p-2 border rounded-xl w-full text-sm sm:text-base ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300"} placeholder:text-sm`}
-      />
-      {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
-    </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {/* Email */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Email (optional)
+                </label>
+                <input
+                  name="email"
+                  placeholder="example@mail.com"
+                  onChange={handleChange}
+                  className={`p-2 border rounded-xl w-full text-sm sm:text-base ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300"} placeholder:text-sm`}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs">{errors.email}</p>
+                )}
+              </div>
 
-    {/* Phone */}
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-gray-700">Phone / Mobile</label>
-      <div className="flex items-center border rounded-xl overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-blue-500">
-        <select
-          name="phoneCode"
-          value={formData.phoneCode}
-          onChange={handleChange}
-          className="bg-gray-100 px-3 py-2 border-r border-gray-300 text-sm outline-none"
-        >
-          {countryCodes.map(c => (
-            <option key={c.code} value={c.code}>
-              {c.label} {c.code}
-            </option>
-          ))}
-        </select>
-        <input
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="Enter number"
-          className="flex-1 p-2 outline-none text-sm sm:text-base placeholder:text-sm"
-        />
-      </div>
-      {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
-    </div>
+              {/* Phone */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  Phone / Mobile
+                </label>
+                <div className="flex items-center border rounded-xl overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-blue-500">
+                  <select
+                    name="phoneCode"
+                    value={formData.phoneCode}
+                    onChange={handleChange}
+                    className="bg-gray-100 px-3 py-2 border-r border-gray-300 text-sm outline-none"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Enter number"
+                    className="flex-1 p-2 outline-none text-sm sm:text-base placeholder:text-sm"
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="text-red-500 text-xs">{errors.phone}</p>
+                )}
+              </div>
 
-    {/* WhatsApp */}
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium text-gray-700">WhatsApp Number</label>
-      <div className="flex items-center border rounded-xl overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-green-500">
-        <select
-          name="whatsappCode"
-          value={formData.whatsappCode}
-          disabled={sameAsPhone}
-          onChange={handleChange}
-          className="bg-gray-50 px-3 py-2 border-r border-gray-300 text-sm disabled:opacity-50 outline-none"
-        >
-          {countryCodes.map(c => (
-            <option key={c.code} value={c.code}>
-              {c.label} {c.code}
-            </option>
-          ))}
-        </select>
-        <input
-          name="whatsapp"
-          value={formData.whatsapp}
-          onChange={handleChange}
-          disabled={sameAsPhone}
-          placeholder="Enter number"
-          className="flex-1 p-2 outline-none text-sm sm:text-base placeholder:text-sm"
-        />
-      </div>
-      {errors.whatsapp && <p className="text-red-500 text-xs">{errors.whatsapp}</p>}
-    </div>
-  </div>
+              {/* WhatsApp */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-gray-700">
+                  WhatsApp Number
+                </label>
+                <div className="flex items-center border rounded-xl overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-green-500">
+                  <select
+                    name="whatsappCode"
+                    value={formData.whatsappCode}
+                    disabled={sameAsPhone}
+                    onChange={handleChange}
+                    className="bg-gray-50 px-3 py-2 border-r border-gray-300 text-sm disabled:opacity-50 outline-none"
+                  >
+                    {countryCodes.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.label} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    name="whatsapp"
+                    value={formData.whatsapp}
+                    onChange={handleChange}
+                    disabled={sameAsPhone}
+                    placeholder="Enter number"
+                    className="flex-1 p-2 outline-none text-sm sm:text-base placeholder:text-sm"
+                  />
+                </div>
+                {errors.whatsapp && (
+                  <p className="text-red-500 text-xs">{errors.whatsapp}</p>
+                )}
+              </div>
+            </div>
 
-  {/* Checkbox */}
-  <label className="flex items-center gap-2 text-sm text-gray-600 mt-1">
-    <input
-      type="checkbox"
-      checked={sameAsPhone}
-      onChange={(e) => {
-        const checked = e.target.checked;
-        setSameAsPhone(checked);
-        if (checked) {
-          setFormData(prev => ({
-            ...prev,
-            whatsapp: prev.phone,
-            whatsappCode: prev.phoneCode,
-          }));
-        } else {
-          setFormData(prev => ({ ...prev, whatsapp: "" }));
-        }
-      }}
-      className="w-4 h-4 accent-blue-600"
-    />
-    WhatsApp number same as phone
-  </label>
-</div>
-
-
+            {/* Checkbox */}
+            <label className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+              <input
+                type="checkbox"
+                checked={sameAsPhone}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setSameAsPhone(checked);
+                  if (checked) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      whatsapp: prev.phone,
+                      whatsappCode: prev.phoneCode,
+                    }));
+                  } else {
+                    setFormData((prev) => ({ ...prev, whatsapp: "" }));
+                  }
+                }}
+                className="w-4 h-4 accent-blue-600"
+              />
+              WhatsApp number same as phone
+            </label>
+          </div>
 
           {/* ================= BASIC INFO ================= */}
           <div className="space-y-5">
@@ -376,7 +370,9 @@ export default function MemberRegister() {
                   onChange={handleChange}
                   className={`${inputClass("age")} placeholder:text-[11px]`}
                 />
-                {errors.age && <p className="text-red-500 text-xs">{errors.age}</p>}
+                {errors.age && (
+                  <p className="text-red-500 text-xs">{errors.age}</p>
+                )}
               </div>
 
               <div className="relative">
@@ -398,12 +394,19 @@ export default function MemberRegister() {
                   className={`${inputClass("bloodGroup")}`}
                 >
                   <option value="">Blood Group</option>
-                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Nil"]
-                    .map(
-                      (bg) => (
-                        <option key={bg}>{bg}</option>
-                      )
-                    )}
+                  {[
+                    "A+",
+                    "A-",
+                    "B+",
+                    "B-",
+                    "AB+",
+                    "AB-",
+                    "O+",
+                    "O-",
+                    "Nil",
+                  ].map((bg) => (
+                    <option key={bg}>{bg}</option>
+                  ))}
                 </select>
                 {errors.bloodGroup && (
                   <p className="text-red-500 text-xs">{errors.bloodGroup}</p>
@@ -466,7 +469,9 @@ export default function MemberRegister() {
 
                 {/* Payment Screenshot */}
                 <div>
-                  <label className="text-sm font-medium">Payment Screenshot</label>
+                  <label className="text-sm font-medium">
+                    Payment Screenshot
+                  </label>
                   <div className="relative border-2 border-dashed rounded-2xl p-4 text-center hover:border-blue-400 transition">
                     {paymentScreenshot ? (
                       <img
@@ -492,41 +497,53 @@ export default function MemberRegister() {
               </div>
 
               {/* QR */}
-           <div className="flex flex-col items-center gap-3">
-  {/* QR Image */}
-  <div className="relative w-36">
-    <img
-      src={Qr}
-      alt="QR Code"
-      className={`w-full rounded-xl transition-all duration-300 ${
-        showQR ? "blur-0 scale-100" : "blur-md scale-75"
-      }`}
-    />
-    {!showQR && (
-      <button
-        type="button"
-        onClick={() => setShowQR(true)}
-        className="absolute inset-0 bg-black/40 text-white rounded-xl flex items-center justify-center text-sm"
-      >
-        View QR
-      </button>
-    )}
-  </div>
+              <div className="flex flex-col items-center gap-3">
+                {/* QR Thumbnail */}
+                <div className="relative w-36">
+                  <img
+                    src={Qr}
+                    alt="QR Code"
+                    className="w-full rounded-xl shadow cursor-pointer"
+                    onClick={() => setShowQR(true)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowQR(true)}
+                    className="absolute inset-0 bg-black/40 text-white rounded-xl flex items-center justify-center text-sm"
+                  >
+                    View QR
+                  </button>
+                </div>
 
-  {/* Download Button */}
-  {showQR && (
-    <a
-      href={Qr}
-      download="ClubPaymentQR"
-      className="px-4 py-2 bg-blue-700 text-white rounded-xl text-sm hover:bg-blue-800 transition"
-    >
-      Download QR
-    </a>
-  )}
-</div>
-
-
-
+                {/* Fullscreen Modal */}
+                {showQR && (
+                  <div
+                    className="fixed inset-0 bg-black/70 flex flex-col items-center justify-center z-50 p-4"
+                    onClick={() => setShowQR(false)} // close on background click
+                  >
+                    <img
+                      src={Qr}
+                      alt="QR Code"
+                      className="max-w-full max-h-full rounded-xl shadow-lg"
+                      onClick={(e) => e.stopPropagation()} // prevent modal close on image click
+                    />
+                    <a
+                      href={Qr}
+                      download="ClubPaymentQR"
+                      className="mt-4 px-6 py-2 bg-blue-700 text-white rounded-xl text-sm hover:bg-blue-800 transition"
+                      onClick={(e) => e.stopPropagation()} // prevent modal close on download click
+                    >
+                      Download QR
+                    </a>
+                    <button
+                      onClick={() => setShowQR(false)}
+                      className="mt-2 text-white text-sm underline"
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -539,7 +556,6 @@ export default function MemberRegister() {
             {loading ? "Registering..." : "REGISTER"}
           </button>
         </form>
-
       </div>
 
       {showSuccessModal && (
