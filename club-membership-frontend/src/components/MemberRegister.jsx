@@ -114,11 +114,8 @@ export default function MemberRegister() {
       newErrors.email = "Enter a valid email address";
 
     if (!formData.age || Number(formData.age) < 1)
-      newErrors.age = "Age is required";
+      newErrors.age = "Enter a valid age";
 
-
-    if (formData.age && formData.age < 1)
-      newErrors.age = "Age must be greater than 0";
 
     if (!formData.bloodGroup)
       newErrors.bloodGroup = "Please select blood group";
@@ -167,17 +164,13 @@ export default function MemberRegister() {
       if (formData.dob) data.append("dob", formData.dob);
 
       // PHONE (with country code)
-      data.append(
-        "phone",
-        `${formData.phoneCode}${formData.phone}`
-      );
+      data.append("phone", formData.phone);
 
       data.append(
         "whatsapp",
-        sameAsPhone
-          ? `${formData.phoneCode}${formData.phone}`
-          : `${formData.whatsappCode}${formData.whatsapp}`
+        sameAsPhone ? formData.phone : formData.whatsapp
       );
+
 
       // FILES
       data.append("photo", photo);
@@ -239,18 +232,31 @@ export default function MemberRegister() {
             {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
 
             <div>
-  <input
-    name="nickname"
-    placeholder="Nickname / അറിയപ്പെടുന്ന പേര്"
-    onChange={handleChange}
-    className={`${inputClass("nickname")} placeholder:text-[11px]`}
-  />
-  {errors.nickname && (
-    <p className="text-red-500 text-xs">{errors.nickname}</p>
-  )}
-</div>
+              <input
+                name="nickname"
+                placeholder="Nickname / അറിയപ്പെടുന്ന പേര്"
+                onChange={handleChange}
+                className={`${inputClass("nickname")} placeholder:text-[11px]`}
+              />
+              {errors.nickname && (
+                <p className="text-red-500 text-xs">{errors.nickname}</p>
+              )}
+            </div>
+
+            <input
+            name="fatherName"
+            placeholder="Father Name / പിതാവിന്റെ പേര്"
+            onChange={handleChange}
+            className={`${inputClass("fatherName")} placeholder:text-[11px]`}
+          />
+          {errors.fatherName && (
+            <p className="text-red-500 text-xs">{errors.fatherName}</p>
+          )}
 
           </div>
+
+          
+
 
           {/* ================= CONTACT DETAILS ================= */}
           <div className="space-y-5">
@@ -381,11 +387,12 @@ export default function MemberRegister() {
                   className={`${inputClass("bloodGroup")}`}
                 >
                   <option value="">Blood Group</option>
-                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "NIL"].map(
-                    (bg) => (
-                      <option key={bg}>{bg}</option>
-                    )
-                  )}
+                  {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Nil"]
+                    .map(
+                      (bg) => (
+                        <option key={bg}>{bg}</option>
+                      )
+                    )}
                 </select>
                 {errors.bloodGroup && (
                   <p className="text-red-500 text-xs">{errors.bloodGroup}</p>
