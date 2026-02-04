@@ -101,7 +101,7 @@ export default function AdminPage() {
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       {/* Sidebar */}
-       <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col flex-row md:min-h-screen">
+      <aside className="w-full md:w-64 bg-white shadow-md flex md:flex-col flex-row md:min-h-screen">
         <div className="px-4 py-3 md:px-6 md:py-4 text-xl md:text-2xl font-bold border-b">
           Admin Panel
         </div>
@@ -120,22 +120,24 @@ export default function AdminPage() {
             Users
           </button>
           <button
-          onClick={handleLogout}
-          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
-        >
-          Logout
-        </button>
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
+          >
+            Logout
+          </button>
         </nav>
       </aside>
 
-      {/* Main */}
+      {/* Main Content */}
       <main className="flex-1 p-4 md:p-6 overflow-x-auto">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center md:text-left">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center md:text-left text-indigo-700">
           Pending Approvals
         </h1>
 
         {error && (
-          <p className="text-red-500 mb-4 text-center md:text-left">{error}</p>
+          <p className="text-red-500 mb-4 text-center md:text-left font-medium">
+            {error}
+          </p>
         )}
 
         {loading ? (
@@ -147,43 +149,41 @@ export default function AdminPage() {
             {users.map((user) => (
               <div
                 key={user._id}
-                className="bg-white shadow rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+                className="bg-white shadow-lg rounded-3xl p-5 flex flex-col sm:flex-row gap-5 sm:items-center transition-transform hover:scale-[1.01]"
               >
                 {/* Photo */}
-                {/* Photo */}
-<a
-  href={user.photo || "/no-user.png"}
-  download={`${user.name || "user"}-photo.jpg`}
-  onClick={() => setPreviewImage(user.photo)}
->
-  <img
-    src={user.photo || "/no-user.png"}
-    alt={user.name}
-    onError={(e) => (e.target.src = "/no-user.png")}
-    className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
-  />
-</a>
+                <a
+                  href={user.photo || "/no-user.png"}
+                  download={`${user.name || "user"}-photo.jpg`}
+                  onClick={() => setPreviewImage(user.photo)}
+                  className="flex-shrink-0"
+                >
+                  <img
+                    src={user.photo || "/no-user.png"}
+                    alt={user.name}
+                    onError={(e) => (e.target.src = "/no-user.png")}
+                    className="w-24 h-24 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-indigo-300 shadow-md cursor-pointer hover:scale-105 transition-transform"
+                  />
+                </a>
 
                 {/* Details */}
-                <div className="flex-1 space-y-1 text-sm sm:text-base overflow-x-auto">
-                  <p><b>Name:</b> {user.name}</p>
-                  <p><b>Father Name:</b> {user.fatherName || "—"}</p>
-                  <p><b>Nickname:</b> {user.nickname}</p>
-                  <p><b>Email:</b> {user.email || "—"}</p>
-                  <p><b>Phone:</b> {user.phone}</p>
-                  <p><b>WhatsApp:</b> {user.whatsapp}</p>
-                  <p><b>Blood Group:</b> {user.bloodGroup}</p>
-                  <p><b>Address:</b> {user.address}</p>
-                  <p><b>DOB:</b> {formatDate(user.dob)}</p>
-                 <p><b>Valid Upto:</b> {STATIC_VALID_UPTO}</p>
-
-
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm sm:text-base overflow-x-auto">
+                  <Detail label="Name" value={user.name} />
+                  <Detail label="Father Name" value={user.fatherName || "—"} />
+                  <Detail label="Nickname" value={user.nickname} />
+                  <Detail label="Email" value={user.email || "—"} />
+                  <Detail label="Phone" value={user.phone} />
+                  <Detail label="WhatsApp" value={user.whatsapp} />
+                  <Detail label="Blood Group" value={user.bloodGroup} />
+                  <Detail label="Address" value={user.address} />
+                  <Detail label="DOB" value={formatDate(user.dob)} />
+                  <Detail label="Valid Upto" value={STATIC_VALID_UPTO} />
                   {user.paymentProof && (
                     <a
                       href={user.paymentProof}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-blue-600 text-sm"
+                      className="text-blue-600 text-sm col-span-full hover:underline"
                     >
                       View Payment Proof
                     </a>
@@ -191,11 +191,11 @@ export default function AdminPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 flex-wrap mt-2 sm:mt-0">
+                <div className="flex gap-2 flex-wrap mt-3 sm:mt-0 sm:flex-col">
                   <button
                     onClick={() => approveUser(user._id)}
                     disabled={actionLoading === user._id}
-                    className={`px-4 py-2 rounded-lg text-white ${
+                    className={`px-5 py-2 rounded-full text-white font-semibold transition-all duration-200 ${
                       actionLoading === user._id
                         ? "bg-green-400"
                         : "bg-green-600 hover:bg-green-700"
@@ -207,7 +207,7 @@ export default function AdminPage() {
                   <button
                     onClick={() => rejectUser(user._id)}
                     disabled={actionLoading === user._id}
-                    className={`px-4 py-2 rounded-lg text-white ${
+                    className={`px-5 py-2 rounded-full text-white font-semibold transition-all duration-200 ${
                       actionLoading === user._id
                         ? "bg-red-400"
                         : "bg-red-600 hover:bg-red-700"
@@ -221,7 +221,7 @@ export default function AdminPage() {
           </div>
         )}
 
-        {/* IMAGE PREVIEW MODAL */}
+        {/* Image Preview Modal */}
         {previewImage && (
           <div
             className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-2"
@@ -233,7 +233,7 @@ export default function AdminPage() {
             >
               <button
                 onClick={() => setPreviewImage(null)}
-                className="absolute -top-4 -right-4 bg-white rounded-full px-3 py-1 text-lg font-bold shadow"
+                className="absolute -top-4 -right-4 bg-white rounded-full px-3 py-1 text-lg font-bold shadow hover:bg-gray-100 transition"
               >
                 ✕
               </button>
@@ -241,12 +241,22 @@ export default function AdminPage() {
               <img
                 src={previewImage}
                 alt="User Full"
-                className="max-w-full max-h-[80vh] rounded-lg shadow-lg"
+                className="max-w-full max-h-[80vh] rounded-2xl shadow-xl"
               />
             </div>
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+/* Helper component for user details */
+function Detail({ label, value }) {
+  return (
+    <div className="bg-indigo-50 p-3 rounded-xl hover:bg-indigo-100 transition-all shadow-sm">
+      <p className="text-indigo-700 text-xs font-medium">{label}</p>
+      <p className="font-semibold text-gray-800 text-sm">{value}</p>
     </div>
   );
 }

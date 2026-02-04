@@ -49,7 +49,7 @@ export default function MembershipCard({ user }) {
 
       {/* Name & ID */}
       <div className="absolute top-[120px] left-[220px]">
-        <p className=" font-bold text-yellow-600">{user.name}</p>
+        <p className=" font-bold text-yellow-600">{user.nickname}</p>
         <p className=" text-yellow-600 ">{user.membershipId}</p>
       </div>
 

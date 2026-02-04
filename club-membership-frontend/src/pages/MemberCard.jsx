@@ -60,6 +60,48 @@ const MembershipCard = ({ user: propUser }) => {
     }
   };
 
+  const handleShareCard = async () => {
+  if (!componentRef.current) return;
+
+  try {
+    const canvas = await html2canvas(componentRef.current, { scale: 2, useCORS: true });
+    canvas.toBlob(async (blob) => {
+      if (!blob) throw new Error("Failed to generate image blob");
+
+      const fileId = user?.membershipId ? user.membershipId.slice(-4).toUpperCase() : "CARD";
+      const file = new File([blob], `Membership_${fileId}.png`, { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        // Mobile: share directly
+        await navigator.share({
+          files: [file],
+          title: "Membership Card",
+          text: `Hello ${user.name}, here is your Kingstar Arts & Sports Club membership card!`,
+        });
+      } else {
+        // Desktop fallback: download
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(file);
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        alert(
+          "Direct WhatsApp sharing is not supported on this device. The card has been downloaded. You can share it manually via WhatsApp Web."
+        );
+      }
+    });
+  } catch (err) {
+    console.error("Sharing failed:", err);
+    alert("Image generation failed. Please try again.");
+  }
+};
+
+
+
+
+
   /* ==============================
      RENDER
   ============================== */
@@ -98,16 +140,13 @@ const MembershipCard = ({ user: propUser }) => {
 
   {/* Share Button */}
   <button
-    onClick={() => {
-      const message = `Hello ${user.name}, your membership card for Kingstar Arts & Sports Club is ready! Membership ID: ${user.membershipId}`;
-      const phone = user.whatsapp || user.phone || "";
-      const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-      window.open(waLink, "_blank");
-    }}
-    className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
-  >
-    Share
-  </button>
+  onClick={handleShareCard}
+  className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+>
+  Share 
+</button>
+
+
 </div>
 
       

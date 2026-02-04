@@ -38,7 +38,7 @@ export default function MemberDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="min-h-screen flex items-center justify-center  text-lg">
         Loading dashboard...
       </div>
     );
@@ -46,21 +46,23 @@ export default function MemberDashboard() {
 
   if (!member) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="min-h-screen flex items-center justify-center  text-lg">
         Membership under review
       </div>
     );
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r hidden md:flex flex-col justify-between">
-        <div className="p-6 text-2xl font-bold text-indigo-600">Member Portal</div>
+      <aside className="w-64 bg-white border-r hidden md:flex flex-col justify-between shadow-lg">
+        <div className="p-6 text-2xl font-bold text-indigo-600 tracking-wider">
+          Member Portal
+        </div>
         <div className="border-t p-4">
           <button
             onClick={handleLogout}
-            className="w-full text-red-600 font-medium hover:bg-red-50 py-2 rounded-lg"
+            className="w-full text-red-600 font-medium hover:bg-red-50 py-2 rounded-lg transition-all duration-200"
           >
             Logout
           </button>
@@ -70,42 +72,50 @@ export default function MemberDashboard() {
       {/* MAIN */}
       <main className="flex-1 p-6 space-y-8">
         {/* PROFILE HEADER */}
-        <div className="bg-white rounded-2xl shadow p-6 flex flex-col md:flex-row gap-6 items-center">
+        <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col md:flex-row gap-6 items-center transition-all hover:shadow-2xl">
           <img
             src={member.photo || "/default-avatar.png"}
             alt={member.name}
-            className="w-32 h-32 rounded-full border-4 border-indigo-500 object-cover"
+            className="w-32 h-32 rounded-full border-4 border-indigo-500 object-cover shadow-md"
           />
-          <div className="text-center md:text-left">
-            <h1 className="text-3xl font-bold uppercase">{member.nickname}</h1>
-            <p className="text-gray-600">{member.phone}</p>
+          <div className="text-center md:text-left flex-1">
+            <h1 className="text-4xl font-extrabold uppercase text-indigo-600 tracking-wide">
+              {member.nickname}
+            </h1>
+            <p className="text-gray-600 mt-1 text-lg">{member.phone}</p>
 
-            <span className="inline-block mt-2 px-4 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-700">
+            <span className="inline-block mt-4 px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700">
               {member.membershipId?.toUpperCase()}
             </span>
           </div>
         </div>
 
+        {member.membershipStatus === "approved" && (
+          <div className="rounded-3xl shadow-xl bg-white p-6 flex flex-col items-center gap-6 transition-all hover:shadow-2xl">
+            <MembershipCard user={member} />
+          </div>
+        )}
+
         {/* USER DETAILS */}
-        <div className="bg-white rounded-2xl shadow p-6">
-          <h2 className="text-xl font-bold mb-4">Member Details</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div className="bg-white rounded-3xl shadow-xl p-6">
+          <h2 className="text-2xl font-bold mb-6 text-indigo-700 border-b pb-2">
+            Member Details
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
             <Detail label="Full Name" value={member.name} />
             <Detail label="Membership ID" value={member.membershipId} />
             <Detail label="Phone" value={member.phone} />
             <Detail label="Blood Group" value={member.bloodGroup || "N/A"} />
             <Detail label="Valid Upto" value={STATIC_VALID_UPTO || "N/A"} />
-            <Detail label="Joined On" value={new Date(member.createdAt).toLocaleDateString()} />
+            <Detail
+              label="Joined On"
+              value={new Date(member.createdAt).toLocaleDateString()}
+            />
           </div>
         </div>
 
         {/* MEMBERSHIP CARD INLINE */}
-        {member.membershipStatus === "approved" && (
-          <div className=" rounded-2xl px-13  shadow  flex flex-col items-center gap-6">
-            {/* Pass the member directly as a prop */}
-            <MembershipCard user={member} />
-          </div>
-        )}
+        
       </main>
     </div>
   );
@@ -114,9 +124,9 @@ export default function MemberDashboard() {
 /* SMALL HELPER COMPONENT */
 function Detail({ label, value }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
-      <p className="text-gray-500 text-xs">{label}</p>
-      <p className="font-semibold text-gray-800">{value}</p>
+    <div className="bg-indigo-50 rounded-xl p-4 hover:bg-indigo-100 transition-all duration-200 shadow-sm">
+      <p className="text-indigo-600 text-xs font-medium">{label}</p>
+      <p className="font-semibold text-gray-800 text-sm md:text-base">{value}</p>
     </div>
   );
 }
