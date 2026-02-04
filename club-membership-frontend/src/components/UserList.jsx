@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function AdminUserList() {
   const STATIC_VALID_UPTO = "31/03/2027";
   const [approvedUsers, setApprovedUsers] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
   const [rejectedUsers, setRejectedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
@@ -257,12 +258,23 @@ https://www.instagram.com/kingstar.club/`;
 >
   {/* TOP SECTION */}
   <div className="flex items-center gap-4">
-    <img
-      src={user.photo || "/default-user.png"}
-      alt={user.name}
-      className="w-20 h-20 rounded-full object-cover border"
-      onError={(e) => (e.target.src = "/default-user.png")}
-    />
+    {/* Photo */}
+<a
+  href={user.photo || "/default-user.png"}
+  download={`${user.name || "user"}-photo.jpg`}
+  onClick={(e) => {
+    e.preventDefault(); // prevent default download click
+    setPreviewImage(user.photo);
+  }}
+>
+  <img
+    src={user.photo || "/default-user.png"}
+    alt={user.name}
+    className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+    onError={(e) => (e.target.src = "/default-user.png")}
+  />
+</a>
+
 
     <div className="flex-1">
       <p className="text-lg font-semibold">{user.name}</p>
@@ -349,12 +361,23 @@ https://www.instagram.com/kingstar.club/`;
 >
   {/* TOP SECTION */}
   <div className="flex items-center gap-4">
-    <img
-      src={user.photo || "/default-user.png"}
-      alt={user.name}
-      className="w-20 h-20 rounded-full object-cover border"
-      onError={(e) => (e.target.src = "/default-user.png")}
-    />
+    {/* Photo */}
+<a
+  href={user.photo || "/default-user.png"}
+  download={`${user.name || "user"}-photo.jpg`}
+  onClick={(e) => {
+    e.preventDefault(); // prevent default download click
+    setPreviewImage(user.photo);
+  }}
+>
+  <img
+    src={user.photo || "/default-user.png"}
+    alt={user.name}
+    className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+    onError={(e) => (e.target.src = "/default-user.png")}
+  />
+</a>
+
 
     <div className="flex-1">
       <p className="text-lg font-semibold">{user.name}</p>

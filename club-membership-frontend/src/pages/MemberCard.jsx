@@ -87,13 +87,33 @@ const MembershipCard = ({ user: propUser }) => {
       </div>
 
       {/* Download button */}
-      <button
-        onClick={handleDownloadImage}
-        className="mt-6 bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
-      >
-        Download Image
-      </button>
+     <div className="flex gap-4 mt-6">
+  {/* Download Button */}
+  <button
+    onClick={handleDownloadImage}
+    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
+  >
+    Download Image
+  </button>
+
+  {/* Share Button */}
+  <button
+    onClick={() => {
+      const message = `Hello ${user.name}, your membership card for Kingstar Arts & Sports Club is ready! Membership ID: ${user.membershipId}`;
+      const phone = user.whatsapp || user.phone || "";
+      const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(waLink, "_blank");
+    }}
+    className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+  >
+    Share
+  </button>
+</div>
+
+      
     </div>
+
+    
   );
 };
 

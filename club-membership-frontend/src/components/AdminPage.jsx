@@ -150,13 +150,19 @@ export default function AdminPage() {
                 className="bg-white shadow rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center"
               >
                 {/* Photo */}
-                <img
-                  src={user.photo || "/no-user.png"}
-                  alt={user.name}
-                  onClick={() => setPreviewImage(user.photo)}
-                  onError={(e) => (e.target.src = "/no-user.png")}
-                  className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
-                />
+                {/* Photo */}
+<a
+  href={user.photo || "/no-user.png"}
+  download={`${user.name || "user"}-photo.jpg`}
+  onClick={() => setPreviewImage(user.photo)}
+>
+  <img
+    src={user.photo || "/no-user.png"}
+    alt={user.name}
+    onError={(e) => (e.target.src = "/no-user.png")}
+    className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+  />
+</a>
 
                 {/* Details */}
                 <div className="flex-1 space-y-1 text-sm sm:text-base overflow-x-auto">
