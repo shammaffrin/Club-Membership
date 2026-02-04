@@ -53,7 +53,7 @@ export default function MemberDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="flex">
       {/* SIDEBAR */}
       <aside className="w-64 bg-white border-r hidden md:flex flex-col justify-between">
         <div className="p-6 text-2xl font-bold text-indigo-600">Member Portal</div>
@@ -101,7 +101,7 @@ export default function MemberDashboard() {
 
         {/* MEMBERSHIP CARD INLINE */}
         {member.membershipStatus === "approved" && (
-          <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center gap-6">
+          <div className=" rounded-2xl px-13  shadow  flex flex-col items-center gap-6">
             {/* Pass the member directly as a prop */}
             <MembershipCard user={member} />
           </div>

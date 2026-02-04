@@ -27,12 +27,17 @@ export default function MemberRegister() {
 
 
 
-  const countryCodes = [
-    { code: "+91", label: "IN" },
-    { code: "+971", label: "UAE" },
-    { code: "+1", label: "US" },
-    { code: "+44", label: "UK" },
-  ];
+ const countryCodes = [
+  { code: "+91", label: "IN" },
+  { code: "+971", label: "UAE" },
+  { code: "+974", label: "Qatar" },
+  { code: "+966", label: "Saudi" },
+  { code: "+973", label: "Bahrain" },
+  { code: "+965", label: "Kuwait" },
+  { code: "+968", label: "Oman" },
+  { code: "+44", label: "UK" },
+];
+
 
   const [photo, setPhoto] = useState(null);
   const [sameAsPhone, setSameAsPhone] = useState(true);
@@ -255,100 +260,106 @@ export default function MemberRegister() {
 
           </div>
 
-          
+   <div className="space-y-5">
+  <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
+    Contact Details
+  </h3>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {/* Email */}
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-medium text-gray-700">Email (optional)</label>
+      <input
+        name="email"
+        placeholder="example@mail.com"
+        onChange={handleChange}
+        className={`p-2 border rounded-xl w-full text-sm sm:text-base ${errors.email ? "border-red-500 focus:ring-red-400" : "border-gray-300"} placeholder:text-sm`}
+      />
+      {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+    </div>
+
+    {/* Phone */}
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-medium text-gray-700">Phone / Mobile</label>
+      <div className="flex items-center border rounded-xl overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-blue-500">
+        <select
+          name="phoneCode"
+          value={formData.phoneCode}
+          onChange={handleChange}
+          className="bg-gray-100 px-3 py-2 border-r border-gray-300 text-sm outline-none"
+        >
+          {countryCodes.map(c => (
+            <option key={c.code} value={c.code}>
+              {c.label} {c.code}
+            </option>
+          ))}
+        </select>
+        <input
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Enter number"
+          className="flex-1 p-2 outline-none text-sm sm:text-base placeholder:text-sm"
+        />
+      </div>
+      {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+    </div>
+
+    {/* WhatsApp */}
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-medium text-gray-700">WhatsApp Number</label>
+      <div className="flex items-center border rounded-xl overflow-hidden shadow-sm focus-within:ring-1 focus-within:ring-green-500">
+        <select
+          name="whatsappCode"
+          value={formData.whatsappCode}
+          disabled={sameAsPhone}
+          onChange={handleChange}
+          className="bg-gray-50 px-3 py-2 border-r border-gray-300 text-sm disabled:opacity-50 outline-none"
+        >
+          {countryCodes.map(c => (
+            <option key={c.code} value={c.code}>
+              {c.label} {c.code}
+            </option>
+          ))}
+        </select>
+        <input
+          name="whatsapp"
+          value={formData.whatsapp}
+          onChange={handleChange}
+          disabled={sameAsPhone}
+          placeholder="Enter number"
+          className="flex-1 p-2 outline-none text-sm sm:text-base placeholder:text-sm"
+        />
+      </div>
+      {errors.whatsapp && <p className="text-red-500 text-xs">{errors.whatsapp}</p>}
+    </div>
+  </div>
+
+  {/* Checkbox */}
+  <label className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+    <input
+      type="checkbox"
+      checked={sameAsPhone}
+      onChange={(e) => {
+        const checked = e.target.checked;
+        setSameAsPhone(checked);
+        if (checked) {
+          setFormData(prev => ({
+            ...prev,
+            whatsapp: prev.phone,
+            whatsappCode: prev.phoneCode,
+          }));
+        } else {
+          setFormData(prev => ({ ...prev, whatsapp: "" }));
+        }
+      }}
+      className="w-4 h-4 accent-blue-600"
+    />
+    WhatsApp number same as phone
+  </label>
+</div>
 
 
-          {/* ================= CONTACT DETAILS ================= */}
-          <div className="space-y-5">
-            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2">
-              Contact Details
-            </h3>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <input
-                  name="email"
-                  placeholder="Email (optional)"
-                  onChange={handleChange}
-                  className={`${inputClass("email")} placeholder:text-[11px]`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs">{errors.email}</p>
-                )}
-              </div>
-
-              {/* Phone */}
-              <div className="flex gap-2">
-                <select
-                  name="phoneCode"
-                  value={formData.phoneCode}
-                  onChange={handleChange}
-                  className="border rounded-xl px-3 py-3 text-sm bg-gray-50"
-                >
-                  {countryCodes.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.label} {c.code}
-                    </option>
-                  ))}
-                </select>
-
-                <input
-                  name="phone"
-                  value={formData.phone}
-                  placeholder="Mobile Number"
-                  onChange={handleChange}
-                  className={`${inputClass("phone")} placeholder:text-[11px]`}
-                />
-              </div>
-
-              {/* WhatsApp */}
-              <div className="flex gap-2">
-                <select
-                  name="whatsappCode"
-                  disabled={sameAsPhone}
-                  onChange={handleChange}
-                  className="border rounded-xl px-3 py-3 text-sm bg-gray-50 disabled:opacity-50"
-                >
-                  {countryCodes.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.label} {c.code}
-                    </option>
-                  ))}
-                </select>
-
-                <input
-                  name="whatsapp"
-                  disabled={sameAsPhone}
-                  placeholder="WhatsApp Number"
-                  onChange={handleChange}
-                  value={formData.whatsapp}
-                  className={`${inputClass("whatsapp")} placeholder:text-[11px]`}
-                />
-              </div>
-            </div>
-
-            <label className="flex items-center gap-2 text-xs text-gray-600">
-              <input
-                type="checkbox"
-                checked={sameAsPhone}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  setSameAsPhone(checked);
-
-                  if (checked) {
-                    setFormData((prev) => ({
-                      ...prev,
-                      whatsapp: prev.phone,
-                      whatsappCode: prev.phoneCode,
-                    }));
-                  } else {
-                    setFormData((prev) => ({ ...prev, whatsapp: "" }));
-                  }
-                }}
-              />
-              WhatsApp number same as phone
-            </label>
-          </div>
 
           {/* ================= BASIC INFO ================= */}
           <div className="space-y-5">
@@ -481,30 +492,41 @@ export default function MemberRegister() {
               </div>
 
               {/* QR */}
-              <div className="flex items-center justify-center">
-                <div className="bg-gray-50 rounded-2xl p-5 shadow-sm text-center space-y-3">
-                  <div className="relative">
-                    <img
-                      src={Qr}
-                      alt="QR Code"
-                      className={`w-36 mx-auto transition-all duration-300 ${showQR ? "blur-0 scale-50" : "blur-md scale-50"
-                        }`}
-                    />
-                    {!showQR && (
-                      <button
-                        type="button"
-                        onClick={() => setShowQR(true)}
-                        className="absolute inset-0 bg-black/40 text-white rounded-xl flex items-center justify-center text-sm"
-                      >
-                        View QR
-                      </button>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Scan to complete payment
-                  </p>
-                </div>
-              </div>
+           <div className="flex flex-col items-center gap-3">
+  {/* QR Image */}
+  <div className="relative w-36">
+    <img
+      src={Qr}
+      alt="QR Code"
+      className={`w-full rounded-xl transition-all duration-300 ${
+        showQR ? "blur-0 scale-100" : "blur-md scale-75"
+      }`}
+    />
+    {!showQR && (
+      <button
+        type="button"
+        onClick={() => setShowQR(true)}
+        className="absolute inset-0 bg-black/40 text-white rounded-xl flex items-center justify-center text-sm"
+      >
+        View QR
+      </button>
+    )}
+  </div>
+
+  {/* Download Button */}
+  {showQR && (
+    <a
+      href={Qr}
+      download="ClubPaymentQR"
+      className="px-4 py-2 bg-blue-700 text-white rounded-xl text-sm hover:bg-blue-800 transition"
+    >
+      Download QR
+    </a>
+  )}
+</div>
+
+
+
             </div>
           </div>
 

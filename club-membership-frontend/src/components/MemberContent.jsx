@@ -1,142 +1,97 @@
-import lines2 from "../assets/lines2.webp";
-import linesflip from "../assets/lines-flip.webp";
+import React from "react";
+
+// Assets (user said they will provide all images)
+import BgMain from "../assets/hashtag.webp";
+import Hashtag from "../assets/hashtag2.webp";
 import Logo from "../assets/logoFile.webp";
-import stamp from "../assets/stamp.webp";
-import signatur from "../assets/signatur.webp";
-import hashtag2 from "../assets/hashtag2.webp";
-import name from "../assets/name.webp";
+import name from "../assets/name.webp"
+import Lines from "../assets/lines.webp";
+import LinesFlip from "../assets/lines-flip.webp";
+import Lines2 from "../assets/lines2.webp";
+import NameImg from "../assets/name.webp";
+import Stamp from "../assets/stamp.webp";
+import Signature from "../assets/Signatur.webp";
 
-const MemberContent = ({ user }) => {
-  if (!user) return null;
+export default function MembershipCard({ user }) {
+  if (!user) return null; // no user data yet
 
-  const validUpto = user.createdAt
-    ? new Date(
-        new Date(user.createdAt).setFullYear(
-          new Date(user.createdAt).getFullYear() + 1,
-        ),
-      ).toLocaleDateString("en-GB")
-    : "N/A";
-
+    const STATIC_VALID_UPTO = "31/03/2027";
+  
   return (
-    <div id="membership-card" className="relative">
-      <div className="relative w-[1080px] h-[720px] pt-10 px-10 overflow-hidden bg-[#f7f4e8]">
-        <img
-          className="absolute right-0 bottom-0 w-[1240px]"
-          src={linesflip}
-          alt=""
-        />
-        <div className="w-full h-[180px] bg-gradient-to-r relative overflow-hidden from-[#203a8f] rounded-2xl to-[#1f6bd6]">
+    <div className="w-[490px] h-[330px] bg-[#f4f1f1] relative overflow-hidden rounded-3xl shadow-xl font-sans">
+      {/* Top Blue Header */}
+      <div className="w-[450px] h-[100px] bg-gradient-to-r relative overflow-hidden from-[#203a8f] rounded-2xl to-[#1f6bd6] m-4">
           <img
-            src={lines2}
+            src={Lines2}
             alt="Card Background"
-            className="absolute w-[1000px] h-[200px] -bottom-8 left-0"
+            className="absolute w-[800px] h-[117px] -bottom-5 left-0"
           />
         </div>
 
-        {/* CLUB BADGE */}
-        <img
-          src={Logo}
-          alt="Club Badge"
-          className="absolute flex ml-7 mt-16 w-27 top-[-12px] "
-        />
+      {/* Header Waves */}
+      <img src={LinesFlip} alt="lines" className="absolute -top-5 left-0 w-full h-87 opacity-40" />
 
-        {/* HEADER TEXT */}
-        <div className="">
-          <img
-            src={name}
-            alt="Club Badge"
-            className="absolute flex w-[1080px] ml-[190px] bottom-[360px] "
-          />
-          <img
-            src={hashtag2}
-            alt="Club Badge"
-            className="absolute flex w-[280px] ml-[430px] bottom-[512px]  "
-          />
-        </div>
+      {/* Club Logo */}
+      <img src={Logo} alt="logo" className="absolute top-6 left-6 w-15" />
 
-        {/* HASHTAG */}
+      {/* Header Text */}
+      <div className="absolute -right-27 -top-15 w-[500px] ">
+        <img src={name} alt="logo" className=" " />
+      </div>
 
-        {/* PROFILE PHOTO */}
-        <div className="absolute top-[100px] left-[170px] w-[280px] h-[280px] rounded-full bg-white p-2 border border-[3px] border-blue-600">
-          <img
-            src={user.photo}
-            alt={user.name}
-            className="w-full h-full rounded-full object-coverborder border-[2px] border-amber-300"
-          />
-        </div>
+      {/* Hashtag */}
+      <img src={Hashtag} alt="hashtag" className="absolute top-[90px] left-[220px] w-46" />
 
-        {/* NAME & MEMBERSHIP */}
-        <div className="absolute ml-[430px] top-[230px] pt-4 leading-none">
-          <h2 className="text-[39px] font-bold text-yellow-600 uppercase">
-            {user.nickname || user.name}
-          </h2>
-          <p className="text-2xl font-semibold text-yellow-600">
-            {user.membershipId}
-          </p>
+      {/* Profile Image */}
+      <div className="absolute top-[56px] left-20 w-30 h-30 rounded-full border-[6px] border-blue-600 overflow-hidden bg-white">
+        <img src={user.photo} alt="profile" className="w-full h-full object-cover" />
+      </div>
+
+      {/* Name & ID */}
+      <div className="absolute top-[120px] left-[220px]">
+        <p className=" font-bold text-yellow-600">{user.name}</p>
+        <p className=" text-yellow-600 ">{user.membershipId}</p>
+      </div>
+
+      {/* Member Details */}
+      <div className="absolute bottom-5 left-12 text-[12px]">
+        <div className="grid grid-cols-[130px_10px_auto] ">
+          <p>FULL NAME</p><p>:</p><p className="font-semibold">{user.name}</p>
+          <p>MEMBERSHIP ID</p><p>:</p><p className="font-semibold">{user.membershipId}</p>
+          <p>MOBILE NO</p><p>:</p><p className="font-semibold">{user.phone}</p>
+          <p>BLOOD GROUP</p><p>:</p><p className="font-semibold">{user.bloodGroup}</p>
+          <p>VALID UPTO</p><p>:</p><p className="font-semibold">{user.validUpto || STATIC_VALID_UPTO}</p>
+
         </div>
       </div>
 
-      {/* DETAILS */}
-      <div className="absolute bottom-[79px] left-[160px] text-[20px] text-gray-900 ">
-        <div className="grid grid-cols-[180px_20px_1fr] font-normal ">
-          <div className="  uppercase pr-5">FULL NAME</div>
-          <div className=" ">:</div>
-          <div className="  font-semibold uppercase">
-            {user.name}
-          </div>
+      {/* Stamp */}
+      <img src={Stamp} alt="stamp" className="absolute bottom-5 right-23 w-23 opacity-90" />
 
-          <div className="  uppercase ">
-            MEMBERSHIP ID
-          </div>
-          <div className=" ">:</div>
-          <div className="  font-semibold">
-            {user.membershipId}
-          </div>
+      {/* Signature */}
+     <div className="absolute bottom-[14px] right-[17px] flex flex-col items-center text-center">
+  <img
+    src={Signature}
+    alt="Signature"
+    className="w-[50px] pb-1"
+  />
 
-          <div className="  uppercase">MOBILE NO</div>
-          <div className=" ">:</div>
-          <div className="  font-semibold">
-            {user.phone}
-          </div>
+  <p className="border-b border-b-zinc-500 w-[70px]"></p>
 
-          <div className="  uppercase">BLOOD GROUP</div>
-          <div className=" ">:</div>
-          <div className="  font-semibold">
-            {user.bloodGroup || "O+ve"}
-          </div>
+  <p className="font-medium text-[5px] text-gray-600 pt-1">
+    Authorised Signatory
+  </p>
+  <p className="font-medium text-[5px] text-gray-600">
+    (Gen. Secretary)
+  </p>
+</div>
 
-          <div className="uppercase">VALID UPTO</div>
-          <div>:</div>
-          <div className="font-semibold">{validUpto}</div>
-        </div>
-      </div>
 
-      {/* STAMP */}
-      <img
-        src={stamp}
-        alt="Membership Stamp"
-        className="absolute bottom-[30px] right-[250px] w-[290px] rotate-[-12deg] "
-      />
+         
 
-      {/* SIGNATURE */}
-      <div className="absolute bottom-[14px] right-[70px] text-center ">
-        <img
-          src={signatur}
-          alt="Signature"
-          className="w-[160px] flex justify-center "
-        />
-        <div>
-          <p className="border-b border-b-zinc-500 mx-[-25px] "></p>
-        </div>
-        <p className="font-medium text-[12px] text-gray-600 pt-1 uppercase">
-          Authorised Signatory
-        </p>
-        <p className="font-medium text-[12px] text-gray-600 uppercase">
-          (Gen. Secretary)
-        </p>
-      </div>
+      {/* Bottom Waves */}
+      {/* <img src={LinesFlip} alt="wave" className="absolute bottom-0 left-0 w-full opacity-60" /> */}
+      {/* <img src={Lines2} alt="wave2" className="absolute bottom-0 left-0 w-full opacity-40" /> */}
     </div>
   );
-};
-
-export default MemberContent;
+}
