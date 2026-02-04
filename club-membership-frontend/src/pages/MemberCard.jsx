@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import MemberContent from "../components/MemberContent";
 import html2canvas from "html2canvas";
 
-const MembershipCard = () => {
+const MembershipCard = ({ user: propUser }) => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const user = state?.user;
+  const user = propUser || state?.user; // Use prop if provided, else fallback to location state
 
   const componentRef = useRef(null);
 
@@ -67,7 +67,7 @@ const MembershipCard = () => {
     return (
       <div className="flex flex-col items-center text-center">
         <p className="text-red-600 mb-4">
-          Invalid access. Please open from dashboard.
+          User data not found.
         </p>
         <button
           onClick={() => navigate("/dashboard")}
@@ -80,9 +80,9 @@ const MembershipCard = () => {
   }
 
   return (
-    <div className="flex flex-col items-center pt-8">
+    <div className="flex flex-col items-center pt-8 w-full">
       {/* Membership card capture area */}
-      <div ref={componentRef}>
+      <div ref={componentRef} className="w-full max-w-3xl">
         <MemberContent user={user} />
       </div>
 
