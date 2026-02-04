@@ -57,15 +57,14 @@ const userSchema = new mongoose.Schema(
   required: true,
   unique: true,
   trim: true,
-  match: [/^(?:\+91)?[6-9]\d{9}$/, "Invalid phone number"],
 },
 
 whatsapp: {
   type: String,
   required: true,
   trim: true,
-  match: [/^(?:\+91)?[6-9]\d{9}$/, "Invalid WhatsApp number"],
 },
+
 
 
     /* ======================

@@ -1,5 +1,4 @@
 import express from "express";
-import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import upload from "../middleware/cloudinaryUpload.js";
 
@@ -10,25 +9,21 @@ const router = express.Router();
 ====================== */
 const getNextMembershipId = async () => {
   const lastUser = await User.findOne({
-    membershipId: { $regex: "^K-STAR2026/" }
+    membershipId: { $regex: "^K-STAR2026/" },
   }).sort({ createdAt: -1 });
 
   let nextNumber = 1;
 
   if (lastUser?.membershipId) {
-    const lastNumber = parseInt(
-      lastUser.membershipId.split("/")[1],
-      10
-    );
+    const lastNumber = parseInt(lastUser.membershipId.split("/")[1], 10);
     nextNumber = lastNumber + 1;
   }
 
   return `K-STAR2026/${String(nextNumber).padStart(4, "0")}`;
 };
 
-
 /* ======================
-   REGISTER (WITH PHOTO + PAYMENT)
+   REGISTER
 ====================== */
 router.post(
   "/register",
@@ -45,7 +40,7 @@ router.post(
         email,
         age,
         phone,
-        Whatsapp,
+        whatsapp,
         bloodGroup,
         address,
         dob,
@@ -60,7 +55,7 @@ router.post(
         !nickname ||
         !age ||
         !phone ||
-        !Whatsapp ||
+        !whatsapp ||
         !bloodGroup ||
         !address
       ) {
@@ -72,33 +67,40 @@ router.post(
 
       if (!req.files?.photo || !req.files?.paymentProof) {
         return res.status(400).json({
+          success: false,
           message: "Photo and payment proof are required",
         });
       }
 
       /* ======================
-         PHONE / WHATSAPP VALIDATION
+         PHONE NORMALIZATION
       ====================== */
-      const phoneRegex = /^(?:\+91)?[6-9]\d{9}$/;
+      const normalize = (num) => num.replace(/\D/g, "").slice(-10);
 
-      if (!phoneRegex.test(phone) || !phoneRegex.test(Whatsapp)) {
+      const cleanPhone = normalize(phone);
+      const cleanWhatsapp = normalize(whatsapp);
+
+      const phoneRegex = /^[6-9]\d{9}$/;
+
+      if (!phoneRegex.test(cleanPhone)) {
         return res.status(400).json({
           success: false,
-          message: "Enter valid phone and WhatsApp numbers",
+          message: "Invalid phone number",
+        });
+      }
+
+      if (!phoneRegex.test(cleanWhatsapp)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid WhatsApp number",
         });
       }
 
       /* ======================
-         BLOOD GROUP NORMALIZE
-      ====================== */
-      const normalizedBloodGroup =
-        bloodGroup.toUpperCase() === "NIL" ? "Nil" : bloodGroup;
-
-      /* ======================
-         DUPLICATE CHECKS
+         DUPLICATE CHECK
       ====================== */
       const existingUser = await User.findOne({
-        $or: [{ phone }, { Whatsapp }],
+        $or: [{ phone: cleanPhone }, { whatsapp: cleanWhatsapp }],
       });
 
       if (existingUser) {
@@ -119,9 +121,10 @@ router.post(
         nickname,
         email: email || null,
         age,
-        phone,
-        Whatsapp,
-        bloodGroup: normalizedBloodGroup,
+        phone: cleanPhone,
+        whatsapp: cleanWhatsapp,
+        bloodGroup:
+          bloodGroup.toUpperCase() === "NIL" ? "Nil" : bloodGroup,
         address,
         dob: dob || null,
 
