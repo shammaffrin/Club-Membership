@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function MemberDashboard() {
+  const STATIC_VALID_UPTO = "31/03/2027";
   const [member, setMember] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPreview, setShowPreview] = useState(false);
@@ -140,7 +141,7 @@ export default function MemberDashboard() {
             <Detail label="Membership ID" value={member.membershipId} />
             <Detail label="Phone" value={member.phone} />
             <Detail label="Blood Group" value={member.bloodGroup || "N/A"} />
-            <Detail label="Valid Upto" value={expiryDate} />
+            <p><b>Valid Upto:</b> {STATIC_VALID_UPTO}</p>
             <Detail
               label="Joined On"
               value={new Date(member.createdAt).toLocaleDateString()}

@@ -3,9 +3,13 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminUserList() {
+  const STATIC_VALID_UPTO = "31/03/2027";
   const [approvedUsers, setApprovedUsers] = useState([]);
   const [rejectedUsers, setRejectedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState(null);
+const [editForm, setEditForm] = useState({});
+const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all"); // all | approved | rejected
 
@@ -22,12 +26,48 @@ export default function AdminUserList() {
     });
   };
 
+  const openEditModal = (user) => {
+  setEditingUser(user);
+  setEditForm({
+    name: user.name || "",
+    phone: user.phone || "",
+    email: user.email || "",
+    address: user.address || "",
+    dob: user.dob ? user.dob.split("T")[0] : "",
+    bloodGroup: user.bloodGroup || "",
+    gender: user.gender || "",
+  });
+};
+
+const handleSaveChanges = async () => {
+  try {
+    setActionLoading(true);
+
+    await axios.put(
+      `https://club-membership.vercel.app/api/admin/user/${editingUser._id}`,
+      editForm,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    setEditingUser(null);
+    fetchUsers();
+  } catch (err) {
+    alert(err.response?.data?.message || "Update failed");
+  } finally {
+    setActionLoading(false);
+  }
+};
+
+
+
   // WhatsApp share link generator
   // WhatsApp share link generator
 const getWhatsAppLink = (user) => {
-  const phone = user.phone.startsWith("+")
-    ? user.phone
-    : `91${user.phone}`;
+  const rawNumber = user.whatsapp || user.phone;
+
+  const phone = rawNumber.startsWith("+")
+    ? rawNumber.replace("+", "")
+    : rawNumber;
 
   let message = "";
 
@@ -45,7 +85,8 @@ Member Details:
 • Father’s Name: ${user.fatherName || "—"}
 • Place: ${user.address || "—"}
 • Blood Group: ${user.bloodGroup || "—"}
-• Valid Upto: ${formatDate(user.expiryDate)}
+• Valid Upto: ${STATIC_VALID_UPTO}
+
 
 _Thank you for becoming a member of Kingstar Arts & Sports Club._
 
@@ -128,6 +169,8 @@ https://www.instagram.com/kingstar.club/`;
     );
   }
 
+  
+
   return (
     <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
       {/* Sidebar */}
@@ -209,55 +252,79 @@ https://www.instagram.com/kingstar.club/`;
               <div className="space-y-4">
                 {approvedUsers.map((user) => (
                   <div
-                    key={user._id}
-                    className="bg-white shadow-md rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
-                  >
-                    <img
-                      src={user.photo || "/default-user.png"}
-                      alt={user.name}
-                      className="w-24 h-24 rounded-full object-cover border"
-                      onError={(e) => (e.target.src = "/default-user.png")}
-                    />
+  key={user._id}
+  className="bg-white shadow-md rounded-xl p-4 space-y-4"
+>
+  {/* TOP SECTION */}
+  <div className="flex items-center gap-4">
+    <img
+      src={user.photo || "/default-user.png"}
+      alt={user.name}
+      className="w-20 h-20 rounded-full object-cover border"
+      onError={(e) => (e.target.src = "/default-user.png")}
+    />
 
-                    <div className="flex-1 space-y-1 text-sm md:text-base">
-                      <p><b>Name:</b> {user.name}</p>
-                      <p><b>Father Name:</b> {user.fatherName || "—"}</p>
-                      <p><b>Nickname:</b> {user.nickname || "—"}</p>
-                      <p><b>Email:</b> {user.email || "—"}</p>
-                      <p><b>Phone:</b> {user.phone}</p>
-                      <p><b>Age:</b> {user.age || "—"}</p>
-                      <p><b>DOB:</b> {formatDate(user.dob)}</p>
-                      <p><b>Blood Group:</b> {user.bloodGroup || "—"}</p>
-                      <p><b>Address:</b> {user.address || "—"}</p>
-                      <p><b>Membership ID:</b> {user.membershipId}</p>
-                      <p><b>Valid Upto:</b> {formatDate(user.expiryDate)}</p>
+    <div className="flex-1">
+      <p className="text-lg font-semibold">{user.name}</p>
+      <p className="text-sm text-gray-600">
+        ID: <b>{user.membershipId}</b>
+      </p>
+      <p className="text-sm text-gray-600">
+        Valid Upto: <b>{STATIC_VALID_UPTO}</b>
+      </p>
+    </div>
 
-                      {user.paymentProof && (
-                        <a
-                          href={user.paymentProof}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-600 text-sm"
-                        >
-                          View Payment Proof
-                        </a>
-                      )}
-                    </div>
+    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
+      Approved
+    </span>
+  </div>
 
-                    <div className="flex flex-col md:flex-row gap-2 items-center">
-                      <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
-                        Approved
-                      </span>
-                      <a
-                        href={getWhatsAppLink(user)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-900"
-                      >
-                        Share
-                      </a>
-                    </div>
-                  </div>
+  {/* DETAILS GRID */}
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+    <p><b>Phone:</b> {user.phone}</p>
+    <p><b>Email:</b> {user.email || "—"}</p>
+    <p><b>Father:</b> {user.fatherName || "—"}</p>
+    <p><b>Nickname:</b> {user.nickname || "—"}</p>
+    <p><b>Whatsapp:</b> {user.whatsapp || "—"}</p>
+    <p><b>DOB:</b> {formatDate(user.dob)}</p>
+    <p><b>Blood:</b> {user.bloodGroup || "—"}</p>
+    <p className="col-span-2 md:col-span-3">
+      <b>Address:</b> {user.address || "—"}
+    </p>
+  </div>
+
+  {/* PAYMENT */}
+  {user.paymentProof && (
+    <a
+      href={user.paymentProof}
+      target="_blank"
+      rel="noreferrer"
+      className="text-blue-600 text-sm inline-block"
+    >
+      View Payment Proof
+    </a>
+  )}
+
+  {/* ACTIONS */}
+  <div className="flex gap-3 pt-2">
+    <a
+      href={getWhatsAppLink(user)}
+      target="_blank"
+      rel="noreferrer"
+      className="flex-1 text-center px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
+    >
+      Share
+    </a>
+
+    <button
+      onClick={() => openEditModal(user)}
+      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+    >
+      Edit
+    </button>
+  </div>
+</div>
+
                 ))}
               </div>
             )}
@@ -277,59 +344,157 @@ https://www.instagram.com/kingstar.club/`;
               <div className="space-y-4">
                 {rejectedUsers.map((user) => (
                   <div
-                    key={user._id}
-                    className="bg-white shadow-md rounded-xl p-4 flex flex-col md:flex-row gap-4 items-start md:items-center"
-                  >
-                    <img
-                      src={user.photo || "/default-user.png"}
-                      alt={user.name}
-                      className="w-24 h-24 rounded-full object-cover border"
-                      onError={(e) => (e.target.src = "/default-user.png")}
-                    />
+  key={user._id}
+  className="bg-white shadow-md rounded-xl p-4 space-y-4"
+>
+  {/* TOP SECTION */}
+  <div className="flex items-center gap-4">
+    <img
+      src={user.photo || "/default-user.png"}
+      alt={user.name}
+      className="w-20 h-20 rounded-full object-cover border"
+      onError={(e) => (e.target.src = "/default-user.png")}
+    />
 
-                    <div className="flex-1 space-y-1 text-sm md:text-base">
-                      <p><b>Name:</b> {user.name}</p>
-                      <p><b>Father Name:</b> {user.fatherName || "—"}</p>
-                      <p><b>Nickname:</b> {user.nickname || "—"}</p>
-                      <p><b>Email:</b> {user.email || "—"}</p>
-                      <p><b>Phone:</b> {user.phone}</p>
-                      <p><b>Age:</b> {user.age || "—"}</p>
-                      <p><b>DOB:</b> {formatDate(user.dob)}</p>
-                      <p><b>Blood Group:</b> {user.bloodGroup || "—"}</p>
-                      <p><b>Address:</b> {user.address || "—"}</p>
+    <div className="flex-1">
+      <p className="text-lg font-semibold">{user.name}</p>
+      <p className="text-sm text-gray-600">
+        ID: <b>{user.membershipId}</b>
+      </p>
+      <p className="text-sm text-gray-600">
+        Valid Upto: <b>{STATIC_VALID_UPTO}</b>
+      </p>
+    </div>
 
-                      {user.paymentProof && (
-                        <a
-                          href={user.paymentProof}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-blue-600 text-sm"
-                        >
-                          View Payment Proof
-                        </a>
-                      )}
-                    </div>
+    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
+      Approved
+    </span>
+  </div>
 
-                    <div className="flex flex-col md:flex-row gap-2 items-center">
-                      <span className="px-3 py-1 bg-red-500 text-white rounded-full text-sm">
-                        Rejected
-                      </span>
-                      <a
-                        href={getWhatsAppLink(user)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3 py-1 bg-gray-800 text-white rounded-full text-sm hover:bg-gray-900"
-                      >
-                        Share
-                      </a>
-                    </div>
-                  </div>
+  {/* DETAILS GRID */}
+  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+    <p><b>Phone:</b> {user.phone}</p>
+    <p><b>Email:</b> {user.email || "—"}</p>
+    <p><b>Father:</b> {user.fatherName || "—"}</p>
+    <p><b>Nickname:</b> {user.nickname || "—"}</p>
+    <p><b>Whatsapp:</b> {user.whatsapp || "—"}</p>
+    <p><b>DOB:</b> {formatDate(user.dob)}</p>
+    <p><b>Blood:</b> {user.bloodGroup || "—"}</p>
+    <p className="col-span-2 md:col-span-3">
+      <b>Address:</b> {user.address || "—"}
+    </p>
+  </div>
+
+  {/* PAYMENT */}
+  {user.paymentProof && (
+    <a
+      href={user.paymentProof}
+      target="_blank"
+      rel="noreferrer"
+      className="text-blue-600 text-sm inline-block"
+    >
+      View Payment Proof
+    </a>
+  )}
+
+  {/* ACTIONS */}
+  <div className="flex gap-3 pt-2">
+    <a
+      href={getWhatsAppLink(user)}
+      target="_blank"
+      rel="noreferrer"
+      className="flex-1 text-center px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
+    >
+      Share
+    </a>
+
+    <button
+      onClick={() => openEditModal(user)}
+      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+    >
+      Edit
+    </button>
+  </div>
+</div>
+
                 ))}
               </div>
             )}
           </section>
         )}
       </main>
+      {editingUser && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-3">
+      <h2 className="text-xl font-bold text-center">Edit User</h2>
+
+      <input
+        className="w-full border p-2 rounded"
+        placeholder="Name"
+        value={editForm.name}
+        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+      />
+
+      <input
+        className="w-full border p-2 rounded"
+        placeholder="Phone"
+        value={editForm.phone}
+        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+      />
+
+      <input
+        className="w-full border p-2 rounded"
+        placeholder="Email"
+        value={editForm.email}
+        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+      />
+
+      <input
+        type="date"
+        className="w-full border p-2 rounded"
+        value={editForm.dob}
+        onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
+      />
+
+      <input
+        className="w-full border p-2 rounded"
+        placeholder="Blood Group"
+        value={editForm.bloodGroup}
+        onChange={(e) =>
+          setEditForm({ ...editForm, bloodGroup: e.target.value })
+        }
+      />
+
+      <textarea
+        className="w-full border p-2 rounded"
+        placeholder="Address"
+        value={editForm.address}
+        onChange={(e) =>
+          setEditForm({ ...editForm, address: e.target.value })
+        }
+      />
+
+      <div className="flex justify-between pt-4">
+        <button
+          onClick={() => setEditingUser(null)}
+          className="px-4 py-2 border rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+  disabled={actionLoading}
+  onClick={handleSaveChanges}
+  className="px-4 py-2 bg-green-600 text-white rounded"
+>
+  Save Changes
+</button>
+
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }

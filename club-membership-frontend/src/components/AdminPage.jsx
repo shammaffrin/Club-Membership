@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminPage() {
+  const STATIC_VALID_UPTO = "31/03/2027";
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -164,11 +165,12 @@ export default function AdminPage() {
                   <p><b>Nickname:</b> {user.nickname}</p>
                   <p><b>Email:</b> {user.email || "—"}</p>
                   <p><b>Phone:</b> {user.phone}</p>
-                  <p><b>WhatsApp:</b> {user.Whatsapp}</p>
+                  <p><b>WhatsApp:</b> {user.whatsapp}</p>
                   <p><b>Blood Group:</b> {user.bloodGroup}</p>
                   <p><b>Address:</b> {user.address}</p>
                   <p><b>DOB:</b> {formatDate(user.dob)}</p>
-                  <p><b>Valid Upto:</b> {user.expiryDate}</p>
+                 <p><b>Valid Upto:</b> {STATIC_VALID_UPTO}</p>
+
 
                   {user.paymentProof && (
                     <a
