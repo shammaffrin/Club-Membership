@@ -103,11 +103,18 @@ router.put("/reject/:id", adminAuth, async (req, res) => {
     }
 
     user.membershipStatus = "rejected";
+    user.approvedAt = null;
+    user.expiryDate = null;
+    user.membershipId = null;
+
     await user.save();
 
-    res.status(200).json({ success: true, user });
+    res.status(200).json({
+      success: true,
+      message: "User rejected successfully",
+      user,
+    });
   } catch (error) {
-    console.error("Reject user error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -181,6 +188,33 @@ router.put("/user/:id", adminAuth, async (req, res) => {
     });
   }
 });
+
+/* =========================
+   DELETE USER
+========================= */
+router.delete("/user/:id", adminAuth, async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "User deleted permanently",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 
 
 export default router;
