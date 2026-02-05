@@ -51,8 +51,7 @@ export default function MemberRegister() {
      HELPERS
   ====================== */
   const inputClass = (field) =>
-    `p-2 border rounded-lg w-full ${
-      errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
+    `p-2 border rounded-lg w-full ${errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
     }`;
 
   const handleChange = (e) => {
@@ -134,6 +133,17 @@ export default function MemberRegister() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const payViaUPI = () => {
+    const upiId = "sabiaboobacker653-1@okaxis"; // 🔴 change this
+    const name = "Club Membership";
+
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+      name
+    )}&am=${amount}&cu=INR&tn=Membership Fee`;
+
+    window.location.href = upiUrl;
+  };
+
   /* ======================
      SUBMIT
   ====================== */
@@ -201,9 +211,8 @@ export default function MemberRegister() {
 
         <form
           onSubmit={handleSubmit}
-          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${
-            loading ? "pointer-events-none opacity-70" : ""
-          }`}
+          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${loading ? "pointer-events-none opacity-70" : ""
+            }`}
         >
           {/* ================= PERSONAL DETAILS ================= */}
           <div className="space-y-5">
@@ -527,6 +536,14 @@ export default function MemberRegister() {
                       className="max-w-full max-h-full rounded-xl shadow-lg"
                       onClick={(e) => e.stopPropagation()} // prevent modal close on image click
                     />
+                    <button
+                      type="button"
+                      onClick={payViaUPI}
+                      className="px-5 mt-1 py-3 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700 transition"
+                    >
+                      Pay via UPI Apps
+                    </button>
+
                     <a
                       href={Qr}
                       download="ClubPaymentQR"

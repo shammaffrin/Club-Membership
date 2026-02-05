@@ -7,6 +7,8 @@ import MemberDashboard from "./components/MembershipDashboard";
 import UserList from "./components/UserList";
 import AdminLogin from "./components/AdminLogin";
 import MembershipCard from "./pages/MemberCard";
+import footer from "./components/Footer"
+import Footer from "./components/Footer";
 // import Footer from "./components/footer";
 function App() {
   return (
@@ -22,11 +24,13 @@ function App() {
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/users" element={<UserList />} />
             <Route path="/member" element={<MembershipCard />} />
+            
           </Routes>
+        
         </div>
-
-
+     <Footer />
       </div>
+      
     </Router>
   );
 }
