@@ -133,16 +133,16 @@ export default function MemberRegister() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const payViaUPI = () => {
-    const upiId = "sabiaboobacker653-1@okaxis"; // 🔴 change this
-    const name = "Club Membership";
+ const payViaUPI = () => {
+  const upiId = "sabiaboobacker653-1@okaxis";
+  const name = "Club Membership";
 
-    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
-      name
-    )}&am=${amount}&cu=INR&tn=Membership Fee`;
+  const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+    name
+  )}&cu=INR&tn=Membership Fee`;
 
-    window.location.href = upiUrl;
-  };
+  window.location.href = upiUrl;
+};
 
   /* ======================
      SUBMIT
