@@ -9,8 +9,8 @@ export default function AdminUserList() {
   const [rejectedUsers, setRejectedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
-const [editForm, setEditForm] = useState({});
-const [actionLoading, setActionLoading] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all"); // all | approved | rejected
 
@@ -28,53 +28,54 @@ const [actionLoading, setActionLoading] = useState(false);
   };
 
   const openEditModal = (user) => {
-  setEditingUser(user);
-  setEditForm({
-    name: user.name || "",
-    phone: user.phone || "",
-    email: user.email || "",
-    address: user.address || "",
-    dob: user.dob ? user.dob.split("T")[0] : "",
-    bloodGroup: user.bloodGroup || "",
-    gender: user.gender || "",
-  });
-};
+    setEditingUser(user);
+    setEditForm({
+      name: user.name || "",
+      phone: user.phone || "",
+      email: user.email || "",
+      address: user.address || "",
+      dob: user.dob ? user.dob.split("T")[0] : "",
+      bloodGroup: user.bloodGroup || "",
+      place: user.place || "",
+      gender: user.gender || "",
+    });
+  };
 
-const handleSaveChanges = async () => {
-  try {
-    setActionLoading(true);
+  const handleSaveChanges = async () => {
+    try {
+      setActionLoading(true);
 
-    await axios.put(
-      `https://club-membership.vercel.app/api/admin/user/${editingUser._id}`,
-      editForm,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      await axios.put(
+        `https://club-membership.vercel.app/api/admin/user/${editingUser._id}`,
+        editForm,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    setEditingUser(null);
-    fetchUsers();
-  } catch (err) {
-    alert(err.response?.data?.message || "Update failed");
-  } finally {
-    setActionLoading(false);
-  }
-};
+      setEditingUser(null);
+      fetchUsers();
+    } catch (err) {
+      alert(err.response?.data?.message || "Update failed");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
 
 
   // WhatsApp share link generator
   // WhatsApp share link generator
-const getWhatsAppLink = (user) => {
-  const rawNumber = user.whatsapp || user.phone;
+  const getWhatsAppLink = (user) => {
+    const rawNumber = user.whatsapp || user.phone;
 
-  const phone = rawNumber.startsWith("+")
-    ? rawNumber.replace("+", "")
-    : rawNumber;
+    const phone = rawNumber.startsWith("+")
+      ? rawNumber.replace("+", "")
+      : rawNumber;
 
-  let message = "";
+    let message = "";
 
-  if (user.membershipStatus === "approved") {
-    message = 
-`Hello ${user.name}, Welcome to Kingstar Arts & Sports Club.
+    if (user.membershipStatus === "approved") {
+      message =
+        `Hello ${user.name}, Welcome to Kingstar Arts & Sports Club.
 🎉 Your membership has been approved!
 
 Membership ID: *${user.membershipId}*
@@ -97,11 +98,11 @@ _Thank you for becoming a member of Kingstar Arts & Sports Club._
 
 _Kingstareriyapady.club_
 https://www.instagram.com/kingstar.club/`;
-  }
+    }
 
-  if (user.membershipStatus === "rejected") {
-    message =
-`Hello *${user.name}*,
+    if (user.membershipStatus === "rejected") {
+      message =
+        `Hello *${user.name}*,
 Your membership request with Kingstar Eriyapady has been *rejected* due to {{Reason}}.
 
 For further clarification, please contact the Secretary at:
@@ -112,10 +113,10 @@ _Thank you for your interest in Kingstar Arts & Sports Club._
 ---------------------------------
 _Kingstareriyapady.club_
 https://www.instagram.com/kingstar.club/`;
-  }
+    }
 
-  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-};
+    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  };
 
 
   const fetchUsers = async () => {
@@ -170,7 +171,7 @@ https://www.instagram.com/kingstar.club/`;
     );
   }
 
-  
+
 
   return (
     <div className="flex min-h-screen bg-gray-100 flex-col md:flex-row">
@@ -194,11 +195,11 @@ https://www.instagram.com/kingstar.club/`;
             Users
           </button>
           <button
-          onClick={handleLogout}
-          className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
-        >
-          Logout
-        </button>
+            onClick={handleLogout}
+            className="w-full text-left px-4 py-2 rounded-lg hover:bg-gray-200"
+          >
+            Logout
+          </button>
         </nav>
       </aside>
 
@@ -212,29 +213,26 @@ https://www.instagram.com/kingstar.club/`;
         <div className="flex gap-3 justify-center mb-8 flex-wrap">
           <button
             onClick={() => setFilter("all")}
-            className={`px-4 py-2 rounded-lg ${
-              filter === "all" ? "bg-gray-800 text-white" : "bg-white border"
-            }`}
+            className={`px-4 py-2 rounded-lg ${filter === "all" ? "bg-gray-800 text-white" : "bg-white border"
+              }`}
           >
             All
           </button>
 
           <button
             onClick={() => setFilter("approved")}
-            className={`px-4 py-2 rounded-lg ${
-              filter === "approved"
-                ? "bg-green-600 text-white"
-                : "bg-white border"
-            }`}
+            className={`px-4 py-2 rounded-lg ${filter === "approved"
+              ? "bg-green-600 text-white"
+              : "bg-white border"
+              }`}
           >
             Approved
           </button>
 
           <button
             onClick={() => setFilter("rejected")}
-            className={`px-4 py-2 rounded-lg ${
-              filter === "rejected" ? "bg-red-600 text-white" : "bg-white border"
-            }`}
+            className={`px-4 py-2 rounded-lg ${filter === "rejected" ? "bg-red-600 text-white" : "bg-white border"
+              }`}
           >
             Rejected
           </button>
@@ -253,89 +251,92 @@ https://www.instagram.com/kingstar.club/`;
               <div className="space-y-4">
                 {approvedUsers.map((user) => (
                   <div
-  key={user._id}
-  className="bg-white shadow-md rounded-xl p-4 space-y-4"
->
-  {/* TOP SECTION */}
-  <div className="flex items-center gap-4">
-    {/* Photo */}
-<a
-  href={user.photo || "/default-user.png"}
-  download={`${user.name || "user"}-photo.jpg`}
-  onClick={(e) => {
-    e.preventDefault(); // prevent default download click
-    setPreviewImage(user.photo);
-  }}
->
-  <img
-    src={user.photo || "/default-user.png"}
-    alt={user.name}
-    className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
-    onError={(e) => (e.target.src = "/default-user.png")}
-  />
-</a>
+                    key={user._id}
+                    className="bg-white shadow-md rounded-xl p-4 space-y-4"
+                  >
+                    {/* TOP SECTION */}
+                    <div className="flex items-center gap-4">
+                      {/* Photo */}
+                      <a
+                        href={user.photo || "/default-user.png"}
+                        download={`${user.name || "user"}-photo.jpg`}
+                        onClick={(e) => {
+                          e.preventDefault(); // prevent default download click
+                          setPreviewImage(user.photo);
+                        }}
+                      >
+                        <img
+                          src={user.photo || "/default-user.png"}
+                          alt={user.name}
+                          className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+                          onError={(e) => (e.target.src = "/default-user.png")}
+                        />
+                      </a>
 
 
-    <div className="flex-1">
-      <p className="text-lg font-semibold">{user.name}</p>
-      <p className="text-sm text-gray-600">
-        ID: <b>{user.membershipId}</b>
-      </p>
-      <p className="text-sm text-gray-600">
-        Valid Upto: <b>{STATIC_VALID_UPTO}</b>
-      </p>
-    </div>
+                      <div className="flex-1">
+                        <p className="text-lg font-semibold">{user.name}</p>
+                        <p className="text-sm text-gray-600">
+                          ID: <b>{user.membershipId}</b>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Valid Upto: <b>{STATIC_VALID_UPTO}</b>
+                        </p>
+                      </div>
 
-    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
-      Approved
-    </span>
-  </div>
+                      <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
+                        Approved
+                      </span>
+                    </div>
 
-  {/* DETAILS GRID */}
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
-    <p><b>Phone:</b> {user.phone}</p>
-    <p><b>Email:</b> {user.email || "—"}</p>
-    <p><b>Father:</b> {user.fatherName || "—"}</p>
-    <p><b>Nickname:</b> {user.nickname || "—"}</p>
-    <p><b>Whatsapp:</b> {user.whatsapp || "—"}</p>
-    <p><b>DOB:</b> {formatDate(user.dob)}</p>
-    <p><b>Blood:</b> {user.bloodGroup || "—"}</p>
-    <p className="col-span-2 md:col-span-3">
-      <b>Address:</b> {user.address || "—"}
-    </p>
-  </div>
+                    {/* DETAILS GRID */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                      <p><b>Phone:</b> {user.phone}</p>
+                      <p><b>Email:</b> {user.email || "—"}</p>
+                      <p><b>Father:</b> {user.fatherName || "—"}</p>
+                      <p><b>Nickname:</b> {user.nickname || "—"}</p>
+                      <p><b>Whatsapp:</b> {user.whatsapp || "—"}</p>
+                      <p><b>DOB:</b> {formatDate(user.dob)}</p>
+                      <p><b>Blood:</b> {user.bloodGroup || "—"}</p>
+                      <p className="col-span-2 md:col-span-3">
+  <b>Address:</b> {user.address || "—"}
+</p>
+<p className="col-span-2 md:col-span-3">
+  <b>Place:</b> {user.place || "—"}
+</p>
+                    </div>
 
-  {/* PAYMENT */}
-  {user.paymentProof && (
-    <a
-      href={user.paymentProof}
-      target="_blank"
-      rel="noreferrer"
-      className="text-blue-600 text-sm inline-block"
-    >
-      View Payment Proof
-    </a>
-  )}
+                    {/* PAYMENT */}
+                    {user.paymentProof && (
+                      <a
+                        href={user.paymentProof}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 text-sm inline-block"
+                      >
+                        View Payment Proof
+                      </a>
+                    )}
 
-  {/* ACTIONS */}
-  <div className="flex gap-3 pt-2">
-    <a
-      href={getWhatsAppLink(user)}
-      target="_blank"
-      rel="noreferrer"
-      className="flex-1 text-center px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
-    >
-      Share
-    </a>
+                    {/* ACTIONS */}
+                    <div className="flex gap-3 pt-2">
+                      <a
+                        href={getWhatsAppLink(user)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 text-center px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
+                      >
+                        Share
+                      </a>
 
-    <button
-      onClick={() => openEditModal(user)}
-      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-    >
-      Edit
-    </button>
-  </div>
-</div>
+                      <button
+                        onClick={() => openEditModal(user)}
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
 
                 ))}
               </div>
@@ -356,89 +357,93 @@ https://www.instagram.com/kingstar.club/`;
               <div className="space-y-4">
                 {rejectedUsers.map((user) => (
                   <div
-  key={user._id}
-  className="bg-white shadow-md rounded-xl p-4 space-y-4"
->
-  {/* TOP SECTION */}
-  <div className="flex items-center gap-4">
-    {/* Photo */}
-<a
-  href={user.photo || "/default-user.png"}
-  download={`${user.name || "user"}-photo.jpg`}
-  onClick={(e) => {
-    e.preventDefault(); // prevent default download click
-    setPreviewImage(user.photo);
-  }}
->
-  <img
-    src={user.photo || "/default-user.png"}
-    alt={user.name}
-    className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
-    onError={(e) => (e.target.src = "/default-user.png")}
-  />
-</a>
+                    key={user._id}
+                    className="bg-white shadow-md rounded-xl p-4 space-y-4"
+                  >
+                    {/* TOP SECTION */}
+                    <div className="flex items-center gap-4">
+                      {/* Photo */}
+                      <a
+                        href={user.photo || "/default-user.png"}
+                        download={`${user.name || "user"}-photo.jpg`}
+                        onClick={(e) => {
+                          e.preventDefault(); // prevent default download click
+                          setPreviewImage(user.photo);
+                        }}
+                      >
+                        <img
+                          src={user.photo || "/default-user.png"}
+                          alt={user.name}
+                          className="w-20 h-20 rounded-full object-cover border cursor-pointer hover:scale-105 transition"
+                          onError={(e) => (e.target.src = "/default-user.png")}
+                        />
+                      </a>
 
 
-    <div className="flex-1">
-      <p className="text-lg font-semibold">{user.name}</p>
-      <p className="text-sm text-gray-600">
-        ID: <b>{user.membershipId}</b>
-      </p>
-      <p className="text-sm text-gray-600">
-        Valid Upto: <b>{STATIC_VALID_UPTO}</b>
-      </p>
-    </div>
+                      <div className="flex-1">
+                        <p className="text-lg font-semibold">{user.name}</p>
+                        <p className="text-sm text-gray-600">
+                          ID: <b>{user.membershipId}</b>
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Valid Upto: <b>{STATIC_VALID_UPTO}</b>
+                        </p>
+                      </div>
 
-    <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
-      Approved
-    </span>
-  </div>
+                      <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm">
+                        Approved
+                      </span>
+                    </div>
 
-  {/* DETAILS GRID */}
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
-    <p><b>Phone:</b> {user.phone}</p>
-    <p><b>Email:</b> {user.email || "—"}</p>
-    <p><b>Father:</b> {user.fatherName || "—"}</p>
-    <p><b>Nickname:</b> {user.nickname || "—"}</p>
-    <p><b>Whatsapp:</b> {user.whatsapp || "—"}</p>
-    <p><b>DOB:</b> {formatDate(user.dob)}</p>
-    <p><b>Blood:</b> {user.bloodGroup || "—"}</p>
-    <p className="col-span-2 md:col-span-3">
-      <b>Address:</b> {user.address || "—"}
-    </p>
-  </div>
+                    {/* DETAILS GRID */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                      <p><b>Phone:</b> {user.phone}</p>
+                      <p><b>Email:</b> {user.email || "—"}</p>
+                      <p><b>Father:</b> {user.fatherName || "—"}</p>
+                      <p><b>Nickname:</b> {user.nickname || "—"}</p>
+                      <p><b>Whatsapp:</b> {user.whatsapp || "—"}</p>
+                      <p><b>DOB:</b> {formatDate(user.dob)}</p>
+                      <p><b>Blood:</b> {user.bloodGroup || "—"}</p>
+                      <p className="col-span-2 md:col-span-3">
+  <b>Address:</b> {user.address || "—"}
+</p>
+<p className="col-span-2 md:col-span-3">
+  <b>Place:</b> {user.place || "—"}
+</p>
 
-  {/* PAYMENT */}
-  {user.paymentProof && (
-    <a
-      href={user.paymentProof}
-      target="_blank"
-      rel="noreferrer"
-      className="text-blue-600 text-sm inline-block"
-    >
-      View Payment Proof
-    </a>
-  )}
+                    </div>
 
-  {/* ACTIONS */}
-  <div className="flex gap-3 pt-2">
-    <a
-      href={getWhatsAppLink(user)}
-      target="_blank"
-      rel="noreferrer"
-      className="flex-1 text-center px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
-    >
-      Share
-    </a>
+                    {/* PAYMENT */}
+                    {user.paymentProof && (
+                      <a
+                        href={user.paymentProof}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-600 text-sm inline-block"
+                      >
+                        View Payment Proof
+                      </a>
+                    )}
 
-    <button
-      onClick={() => openEditModal(user)}
-      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
-    >
-      Edit
-    </button>
-  </div>
-</div>
+                    {/* ACTIONS */}
+                    <div className="flex gap-3 pt-2">
+                      <a
+                        href={getWhatsAppLink(user)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 text-center px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
+                      >
+                        Share
+                      </a>
+
+                      <button
+                        onClick={() => openEditModal(user)}
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
 
                 ))}
               </div>
@@ -447,76 +452,83 @@ https://www.instagram.com/kingstar.club/`;
         )}
       </main>
       {editingUser && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-3">
-      <h2 className="text-xl font-bold text-center">Edit User</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-full max-w-md space-y-3">
+            <h2 className="text-xl font-bold text-center">Edit User</h2>
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Name"
-        value={editForm.name}
-        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-      />
+            <input
+              className="w-full border p-2 rounded"
+              placeholder="Name"
+              value={editForm.name}
+              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+            />
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Phone"
-        value={editForm.phone}
-        onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-      />
+            <input
+              className="w-full border p-2 rounded"
+              placeholder="Phone"
+              value={editForm.phone}
+              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+            />
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Email"
-        value={editForm.email}
-        onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-      />
+            <input
+              className="w-full border p-2 rounded"
+              placeholder="Email"
+              value={editForm.email}
+              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+            />
 
-      <input
-        type="date"
-        className="w-full border p-2 rounded"
-        value={editForm.dob}
-        onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
-      />
+            <input
+              type="date"
+              className="w-full border p-2 rounded"
+              value={editForm.dob}
+              onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
+            />
 
-      <input
-        className="w-full border p-2 rounded"
-        placeholder="Blood Group"
-        value={editForm.bloodGroup}
-        onChange={(e) =>
-          setEditForm({ ...editForm, bloodGroup: e.target.value })
-        }
-      />
+            <input
+              className="w-full border p-2 rounded"
+              placeholder="Blood Group"
+              value={editForm.bloodGroup}
+              onChange={(e) =>
+                setEditForm({ ...editForm, bloodGroup: e.target.value })
+              }
+            />
 
-      <textarea
-        className="w-full border p-2 rounded"
-        placeholder="Address"
-        value={editForm.address}
-        onChange={(e) =>
-          setEditForm({ ...editForm, address: e.target.value })
-        }
-      />
+            <textarea
+              className="w-full border p-2 rounded"
+              placeholder="Address"
+              value={editForm.address}
+              onChange={(e) =>
+                setEditForm({ ...editForm, address: e.target.value })
+              }
+            />
 
-      <div className="flex justify-between pt-4">
-        <button
-          onClick={() => setEditingUser(null)}
-          className="px-4 py-2 border rounded"
-        >
-          Cancel
-        </button>
+            <input
+              className="w-full border p-2 rounded"
+              placeholder="Place"
+              value={editForm.place}
+              onChange={(e) => setEditForm({ ...editForm, place: e.target.value })}
+            />
 
-        <button
-  disabled={actionLoading}
-  onClick={handleSaveChanges}
-  className="px-4 py-2 bg-green-600 text-white rounded"
->
-  Save Changes
-</button>
+            <div className="flex justify-between pt-4">
+              <button
+                onClick={() => setEditingUser(null)}
+                className="px-4 py-2 border rounded"
+              >
+                Cancel
+              </button>
 
-      </div>
-    </div>
-  </div>
-)}
+              <button
+                disabled={actionLoading}
+                onClick={handleSaveChanges}
+                className="px-4 py-2 bg-green-600 text-white rounded"
+              >
+                Save Changes
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

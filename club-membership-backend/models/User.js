@@ -114,6 +114,10 @@ whatsapp: {
       unique: true,
       required: true,
     },
+     place: { 
+      type: String, 
+      default: "" 
+    },
 
     membershipCard: {
       type: String,

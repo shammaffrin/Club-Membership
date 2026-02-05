@@ -141,14 +141,19 @@ router.put("/user/:id", adminAuth, async (req, res) => {
       "dob",
       "bloodGroup",
       "gender",
+      "place",
     ];
 
     const updates = {};
     allowedUpdates.forEach((field) => {
-      if (req.body[field] !== undefined) {
-        updates[field] = req.body[field];
-      }
-    });
+  if (
+    req.body[field] !== undefined &&
+    req.body[field] !== ""
+  ) {
+    updates[field] = req.body[field];
+  }
+});
+
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
