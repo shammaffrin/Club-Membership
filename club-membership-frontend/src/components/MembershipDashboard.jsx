@@ -76,7 +76,7 @@ export default function MemberDashboard() {
           <img
             src={member.photo || "/default-avatar.png"}
             alt={member.name}
-            className="w-32 h-32 rounded-full border-4 border-indigo-500 object-cover shadow-md"
+            className="w-40 h-40 rounded-full border-4 border-indigo-500 object-cover shadow-md"
           />
           <div className="text-center md:text-left flex-1">
             <h1 className="text-4xl font-extrabold uppercase text-indigo-600 tracking-wide">

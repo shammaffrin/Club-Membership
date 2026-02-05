@@ -8,6 +8,7 @@ import CenterLogo from "../assets/logo-Malayalam.webp";
 import ClubName from "../assets/logo.webp";
 import Hashtag from "../assets/hashtag.webp";
 import Qr from "../assets/qr.jpeg";
+import UpiIcon from "../assets/Upi.webp";
 
 export default function MemberRegister() {
   const [formData, setFormData] = useState({
@@ -51,7 +52,8 @@ export default function MemberRegister() {
      HELPERS
   ====================== */
   const inputClass = (field) =>
-    `p-2 border rounded-lg w-full ${errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
+    `p-2 border rounded-lg w-full ${
+      errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
     }`;
 
   const handleChange = (e) => {
@@ -133,16 +135,16 @@ export default function MemberRegister() {
     return Object.keys(newErrors).length === 0;
   };
 
- const payViaUPI = () => {
-  const upiId = "sabiaboobacker653-1@okaxis";
-  const name = "Club Membership";
+  const payViaUPI = () => {
+    const upiId = "sabiaboobacker653-1@okaxis";
+    const name = "Club Membership";
 
-  const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
-    name
-  )}&cu=INR&tn=Membership Fee`;
+    const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(
+      name,
+    )}&cu=INR&tn=Membership Fee`;
 
-  window.location.href = upiUrl;
-};
+    window.location.href = upiUrl;
+  };
 
   /* ======================
      SUBMIT
@@ -211,8 +213,9 @@ export default function MemberRegister() {
 
         <form
           onSubmit={handleSubmit}
-          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${loading ? "pointer-events-none opacity-70" : ""
-            }`}
+          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${
+            loading ? "pointer-events-none opacity-70" : ""
+          }`}
         >
           {/* ================= PERSONAL DETAILS ================= */}
           <div className="space-y-5">
@@ -505,13 +508,8 @@ export default function MemberRegister() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={payViaUPI}
-                className="px-5 mt-1 py-3 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700 transition"
-              >
-                Pay via UPI Apps
-              </button>
+            
+
 
               {/* QR */}
               <div className="flex flex-col items-center gap-3">
@@ -532,6 +530,16 @@ export default function MemberRegister() {
                   </button>
                 </div>
 
+                 <button
+    type="button"
+    onClick={payViaUPI}
+    className="flex items-center justify-center shadow-black gap-2 px-3 py-1 text-xs sm:text-sm font-semibold  rounded-lg bg-gray-300 text-black border hover:shadow-lg hover:bg-gray-300  transition"
+  >
+    <img src={UpiIcon} alt="UPI" className="w-8 h-4 sm:w-8 sm:h-4" />
+    Pay via UPI
+  </button>
+
+
                 {/* Fullscreen Modal */}
                 {showQR && (
                   <div
@@ -544,7 +552,6 @@ export default function MemberRegister() {
                       className="max-w-full max-h-full rounded-xl shadow-lg"
                       onClick={(e) => e.stopPropagation()} // prevent modal close on image click
                     />
-
 
                     <a
                       href={Qr}

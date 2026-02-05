@@ -13,52 +13,48 @@ const MembershipCard = ({ user: propUser }) => {
   /* ==============================
      DOWNLOAD AS IMAGE
   ============================== */
-  const handleDownloadImage = async () => {
-    if (!componentRef.current) return;
+ const handleDownloadImage = async () => {
+  if (!componentRef.current) return;
 
-    try {
-      const canvas = await html2canvas(componentRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        onclone: (clonedDoc) => {
-          const root = clonedDoc.documentElement;
-          root.style.color = "#000000";
+  try {
+    const canvas = await html2canvas(componentRef.current, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      onclone: (clonedDoc) => {
+        clonedDoc.querySelectorAll("*").forEach((el) => {
+          const computed = clonedDoc.defaultView.getComputedStyle(el);
 
-          clonedDoc.querySelectorAll("*").forEach((el) => {
-            const computed = clonedDoc.defaultView.getComputedStyle(el);
-
-            ["color", "background-color", "border-color", "outline-color"].forEach(
-              (prop) => {
-                const value = computed.getPropertyValue(prop);
-                if (value && value.includes("oklch")) {
-                  el.style.setProperty(prop, "#000000", "important");
-                }
-              }
-            );
+          ["color", "background-color", "border-color", "outline-color"].forEach((prop) => {
+            const value = computed.getPropertyValue(prop);
+            if (value && value.includes("oklch")) {
+              // replace unsupported oklch with black or white
+              el.style.setProperty(prop, "#000000", "important");
+            }
           });
-        },
-      });
+        });
+      },
+    });
 
-      const imageData = canvas.toDataURL("image/png");
+    const imageData = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
 
-      const link = document.createElement("a");
+    const fileId = user?.membershipId
+      ? user.membershipId.slice(-4).toUpperCase()
+      : "CARD";
 
-      const fileId = user?.membershipId
-        ? user.membershipId.slice(-4).toUpperCase()
-        : "CARD";
+    link.download = `Membership_${fileId}.png`;
+    link.href = imageData;
 
-      link.download = `Membership_${fileId}.png`;
-      link.href = imageData;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error("Image download failed:", error);
+    alert("Image download failed. Please try again.");
+  }
+};
 
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error("Image download failed:", error);
-      alert("Image download failed. Please try again.");
-    }
-  };
 
   const handleShareCard = async () => {
   if (!componentRef.current) return;
@@ -124,7 +120,7 @@ const MembershipCard = ({ user: propUser }) => {
   return (
     <div className="flex flex-col items-center pt-8 w-full">
       {/* Membership card capture area */}
-      <div ref={componentRef} className="style={{ width: 360 }}">
+      <div ref={componentRef} className="relative w-[300px] h-auto ">
         <MemberContent user={user} />
       </div>
 
