@@ -16,7 +16,7 @@ export default function MembershipCard({ user }) {
     const STATIC_VALID_UPTO = "31/03/2027";
   
   return (
-    <div className="w-[300px] h-[200px] bg-[#f4f1f1] relative overflow-hidden rounded-xl shadow-xl font-sans">
+    <div className="w-[300px] h-[200px] bg-[#f4f1f1] relative overflow-hidden rounded-xl shadow-xl ">
       {/* Top Blue Header */}
       <div className="w-[270px] h-[60px] bg-gradient-to-r relative overflow-hidden from-[#203a8f] rounded-xl to-[#1f6bd6] m-4">
           <img
