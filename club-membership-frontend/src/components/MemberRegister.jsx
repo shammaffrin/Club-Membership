@@ -505,6 +505,14 @@ export default function MemberRegister() {
                 </div>
               </div>
 
+              <button
+                type="button"
+                onClick={payViaUPI}
+                className="px-5 mt-1 py-3 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700 transition"
+              >
+                Pay via UPI Apps
+              </button>
+
               {/* QR */}
               <div className="flex flex-col items-center gap-3">
                 {/* QR Thumbnail */}
@@ -536,13 +544,7 @@ export default function MemberRegister() {
                       className="max-w-full max-h-full rounded-xl shadow-lg"
                       onClick={(e) => e.stopPropagation()} // prevent modal close on image click
                     />
-                    <button
-                      type="button"
-                      onClick={payViaUPI}
-                      className="px-5 mt-1 py-3 bg-green-600 text-white rounded-xl text-sm hover:bg-green-700 transition"
-                    >
-                      Pay via UPI Apps
-                    </button>
+
 
                     <a
                       href={Qr}
