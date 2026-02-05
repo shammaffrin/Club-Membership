@@ -118,26 +118,26 @@ const MembershipCard = ({ user: propUser }) => {
   }
 
   return (
-    <div className="flex flex-col items-center pt-8 w-full">
+    <div className="flex flex-col items-center   w-full">
       {/* Membership card capture area */}
       <div ref={componentRef} className="relative w-[300px] h-auto ">
         <MemberContent user={user} />
       </div>
 
       {/* Download button */}
-     <div className="flex gap-4 mt-6">
+     <div className="flex gap-4 mt-3 ">
   {/* Download Button */}
   <button
     onClick={handleDownloadImage}
-    className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
+    className="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition"
   >
-    Download Image
+     MemberShip Card
   </button>
 
   {/* Share Button */}
   <button
   onClick={handleShareCard}
-  className="bg-green-600 text-white px-6 py-3 rounded hover:bg-green-700 transition"
+  className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition"
 >
   Share 
 </button>

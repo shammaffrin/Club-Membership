@@ -16,9 +16,9 @@ export default function MembershipCard({ user }) {
     const STATIC_VALID_UPTO = "31/03/2027";
   
   return (
-    <div className="w-[300px] h-[200px] bg-[#f4f1f1] relative overflow-hidden rounded-3xl shadow-xl font-sans">
+    <div className="w-[300px] h-[200px] bg-[#f4f1f1] relative overflow-hidden rounded-xl shadow-xl font-sans">
       {/* Top Blue Header */}
-      <div className="w-[270px] h-[60px] bg-gradient-to-r relative overflow-hidden from-[#203a8f] rounded-2xl to-[#1f6bd6] m-4">
+      <div className="w-[270px] h-[60px] bg-gradient-to-r relative overflow-hidden from-[#203a8f] rounded-xl to-[#1f6bd6] m-4">
           <img
             src={Lines2}
             alt="Card Background"
@@ -42,13 +42,13 @@ export default function MembershipCard({ user }) {
 
       {/* Profile Image */}
       <div className="absolute top-[42px] left-10 w-19 h-19 rounded-full border-[4px] border-blue-600 overflow-hidden bg-white">
-        <img src={user.photo} alt="profile" className="w-[70px] h-[80px] object-cover" />
+        <img src={user.photo} alt="profile" className="w-full h-full object-cover" />
       </div>
 
       {/* Name & ID */}
-      <div className="absolute top-[80px] left-[126px] text-[11px] uppercase">
-        <p className=" font-bold text-yellow-600">{user.nickname}</p>
-        <p className=" text-yellow-600 ">{user.membershipId}</p>
+      <div className="absolute top-[80px] left-[126px]  uppercase">
+        <p className=" font-bold text-yellow-600 toUpperCase() text-[13px]">{user.nickname}</p>
+        <p className=" text-yellow-600 toUpperCase() text-[11px]">{user.membershipId}</p>
       </div>
 
       {/* Member Details */}

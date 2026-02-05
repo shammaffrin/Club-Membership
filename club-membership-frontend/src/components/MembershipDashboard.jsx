@@ -55,43 +55,61 @@ export default function MemberDashboard() {
   return (
     <div className="flex min-h-screen">
       {/* SIDEBAR */}
-      <aside className="w-64 bg-white border-r hidden md:flex flex-col justify-between shadow-lg">
-        <div className="p-6 text-2xl font-bold text-indigo-600 tracking-wider">
-          Member Portal
-        </div>
-        <div className="border-t p-4">
-          <button
-            onClick={handleLogout}
-            className="w-full text-red-600 font-medium hover:bg-red-50 py-2 rounded-lg transition-all duration-200"
-          >
-            Logout
-          </button>
-        </div>
-      </aside>
+<aside className="w-64 bg-white border-r hidden md:flex flex-col justify-between shadow-lg">
+  {/* Top: Admin Panel title */}
+  <div className="p-6 text-2xl font-bold text-indigo-600 text-center tracking-wider">
+    Admin Panel
+  </div>
+
+  {/* Middle: Tab Selection */}
+  <div className="flex flex-col p-4 gap-3">
+    <button
+      className="w-full text-gray-700 font-medium py-2 rounded-lg hover:bg-indigo-50 transition-all"
+    >
+      Requests
+    </button>
+    <button
+      className="w-full text-gray-700 font-medium py-2 rounded-lg hover:bg-indigo-50 transition-all"
+    >
+      Members
+    </button>
+  </div>
+
+  {/* Bottom: Logout */}
+  <div className="border-t p-4">
+    <button
+      onClick={handleLogout}
+      className="w-full text-white font-medium bg-red-600 hover:bg-red-700 py-2 rounded-lg transition-all duration-200"
+    >
+      Logout
+    </button>
+  </div>
+</aside>
+
 
       {/* MAIN */}
       <main className="flex-1 p-6 space-y-8">
         {/* PROFILE HEADER */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col md:flex-row gap-6 items-center transition-all hover:shadow-2xl">
+        <div className="bg-white rounded-3xl shadow-xl p-4 flex flex-col md:flex-row gap-6 items-center transition-all hover:shadow-2xl">
           <img
             src={member.photo || "/default-avatar.png"}
             alt={member.name}
             className="w-40 h-40 rounded-full border-4 border-indigo-500 object-cover shadow-md"
           />
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-4xl font-extrabold uppercase text-indigo-600 tracking-wide">
+            <h1 className="text-xl font-extrabold uppercase text-indigo-600 tracking-wide">
               {member.nickname}
             </h1>
             <p className="text-gray-600 mt-1 text-lg">{member.phone}</p>
 
-            <span className="inline-block mt-4 px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700">
+            <span className="inline-block mt-2 px-5 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-indigo-100 to-blue-100 text-indigo-700">
               {member.membershipId?.toUpperCase()}
             </span>
           </div>
         </div>
 
         {member.membershipStatus === "approved" && (
-          <div className="rounded-3xl shadow-xl bg-white p-6 flex flex-col items-center gap-6 transition-all hover:shadow-2xl">
+          <div className="rounded-3xl shadow-xl bg-white p-3 flex flex-col items-center gap-6 transition-all hover:shadow-2xl">
             <MembershipCard user={member} />
           </div>
         )}

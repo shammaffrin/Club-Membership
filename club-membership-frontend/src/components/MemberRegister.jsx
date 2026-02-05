@@ -514,6 +514,14 @@ export default function MemberRegister() {
               {/* QR */}
               <div className="flex flex-col items-center gap-3">
                 {/* QR Thumbnail */}
+                 <button
+    type="button"
+    onClick={payViaUPI}
+    className="flex items-center justify-center shadow-black gap-2 px-3 py-1 text-xs sm:text-sm font-semibold  rounded-lg bg-gray-300 text-black border hover:shadow-lg hover:bg-gray-300  transition"
+  >
+    <img src={UpiIcon} alt="UPI" className="w-8 h-4 sm:w-8 sm:h-4" />
+    Pay via UPI
+  </button>
                 <div className="relative w-36">
                   <img
                     src={Qr}
@@ -530,14 +538,7 @@ export default function MemberRegister() {
                   </button>
                 </div>
 
-                 <button
-    type="button"
-    onClick={payViaUPI}
-    className="flex items-center justify-center shadow-black gap-2 px-3 py-1 text-xs sm:text-sm font-semibold  rounded-lg bg-gray-300 text-black border hover:shadow-lg hover:bg-gray-300  transition"
-  >
-    <img src={UpiIcon} alt="UPI" className="w-8 h-4 sm:w-8 sm:h-4" />
-    Pay via UPI
-  </button>
+                
 
 
                 {/* Fullscreen Modal */}
