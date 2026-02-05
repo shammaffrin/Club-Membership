@@ -124,7 +124,7 @@ const MembershipCard = ({ user: propUser }) => {
   return (
     <div className="flex flex-col items-center pt-8 w-full">
       {/* Membership card capture area */}
-      <div ref={componentRef} className="w-full max-w-3xl">
+      <div ref={componentRef} className="style={{ width: 360 }}">
         <MemberContent user={user} />
       </div>
 
