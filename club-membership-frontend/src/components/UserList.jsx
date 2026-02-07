@@ -57,14 +57,14 @@ export default function AdminUserList() {
   };
 
   const rejectUser = async (id) => {
-  if (!window.confirm("Reject this user?")) return;
-  await axios.put(
-    `https://club-membership.vercel.app/api/admin/reject/${id}`,
-    {},
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  fetchUsers();
-};
+    if (!window.confirm("Reject this user?")) return;
+    await axios.put(
+      `https://club-membership.vercel.app/api/admin/reject/${id}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    fetchUsers();
+  };
 
 
   const deleteUser = async (id) => {
@@ -109,7 +109,7 @@ export default function AdminUserList() {
 
   const getWhatsAppLink = (user) => {
     const phone = (user.whatsapp || user.phone).replace("+", "");
-    let message = user.membershipStatus === "approved" 
+    let message = user.membershipStatus === "approved"
       ? `Hello ${user.name}, your membership has been approved. ID: ${user.membershipId}`
       : `Hello ${user.name}, your membership has been rejected.`;
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
@@ -136,7 +136,7 @@ export default function AdminUserList() {
         <div className="flex md:hidden justify-around mb-3">
           {["Requests", "Members", "Logout"].map((tab) => {
             const isActive = (tab === "Requests" && location.pathname === "/admin") ||
-                             (tab === "Members" && location.pathname === "/users");
+              (tab === "Members" && location.pathname === "/users");
             return (
               <button
                 key={tab}
@@ -170,9 +170,9 @@ export default function AdminUserList() {
 
         {/* Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
-          {["all","approved","rejected"].map(f => (
+          {["all", "approved", "rejected"].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm sm:text-base ${filter===f ? "bg-gray-800 text-white" : "bg-white border"}`}>
+              className={`px-4 py-2 rounded-lg text-sm sm:text-base ${filter === f ? "bg-gray-800 text-white" : "bg-white border"}`}>
               {f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
@@ -181,8 +181,8 @@ export default function AdminUserList() {
         {/* Users Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 gap-4">
           {filteredUsers.map(user => (
-            <UserCard key={user._id} user={user} STATIC_VALID_UPTO={STATIC_VALID_UPTO} 
-              approveUser={approveUser} rejectUser={rejectUser} deleteUser={deleteUser} 
+            <UserCard key={user._id} user={user} STATIC_VALID_UPTO={STATIC_VALID_UPTO}
+              approveUser={approveUser} rejectUser={rejectUser} deleteUser={deleteUser}
               openEditModal={openEditModal} getWhatsAppLink={getWhatsAppLink} />
           ))}
         </div>
@@ -222,7 +222,7 @@ export default function AdminUserList() {
 /* COMPONENTS */
 function SidebarButton({ label, icon, active, onClick, color }) {
   const baseClasses = "w-full flex items-center px-4 py-2 rounded-lg transition font-medium";
-  
+
   let buttonClasses = "";
   if (color === "red") {
     buttonClasses = "bg-red-600 text-white hover:bg-red-700";
@@ -247,7 +247,7 @@ function UserCard({ user, STATIC_VALID_UPTO, approveUser, rejectUser, deleteUser
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-4 w-full flex flex-col">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <img src={user.photo || "/default-user.png"} alt={user.name} className="w-20 h-20 rounded-full object-cover border"/>
+          <img src={user.photo || "/default-user.png"} alt={user.name} className="w-20 h-20 rounded-full object-cover border" />
           <div>
             <p className="font-semibold text-lg">{user.name}</p>
             <p className="text-xs text-gray-600">ID: {user.membershipId}</p>
@@ -271,8 +271,23 @@ function UserCard({ user, STATIC_VALID_UPTO, approveUser, rejectUser, deleteUser
           <p><b>Place:</b> {user.place || "—"}</p>
 
           <div className="flex gap-2 flex-wrap pt-2">
-            {user.membershipStatus !== "approved" && <button onClick={() => approveUser(user._id)} className="px-2 py-1 text-xs bg-green-600 text-white rounded">Approve</button>}
-            {user.membershipStatus !== "rejected" && <button onClick={() => rejectUser(user._id)} className="px-2 py-1 text-xs bg-orange-600 text-white rounded">Reject</button>}
+            {user.membershipStatus === "approved" && (
+              <button
+                onClick={() => rejectUser(user._id)}
+                className="px-2 py-1 text-xs bg-orange-600 text-white rounded"
+              >
+                Reject
+              </button>
+            )}
+
+            {user.membershipStatus === "rejected" && (
+              <button
+                onClick={() => approveUser(user._id)}
+                className="px-2 py-1 text-xs bg-green-600 text-white rounded"
+              >
+                Re-Approve
+              </button>
+            )}
             <button onClick={() => openEditModal(user)} className="px-2 py-1 text-xs bg-blue-600 text-white rounded">Edit</button>
             <button onClick={() => deleteUser(user._id)} className="px-2 py-1 text-xs bg-red-800 text-white rounded">Delete</button>
             <a href={getWhatsAppLink(user)} target="_blank" className="px-2 py-1 text-xs bg-gray-800 text-white rounded">Share</a>

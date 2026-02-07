@@ -52,8 +52,7 @@ export default function MemberRegister() {
      HELPERS
   ====================== */
   const inputClass = (field) =>
-    `p-2 border rounded-lg w-full ${
-      errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
+    `p-2 border rounded-lg w-full ${errors[field] ? "border-red-500 focus:ring-red-400" : "border-gray-300"
     }`;
 
   const handleChange = (e) => {
@@ -113,8 +112,17 @@ export default function MemberRegister() {
     if (formData.email && !/^\S+@\S+\.\S+$/.test(formData.email))
       newErrors.email = "Enter a valid email address";
 
-    if (!formData.age || Number(formData.age) < 1)
+    // Either Age or DOB is required
+    if (!formData.age && !formData.dob) {
+      newErrors.age = "Enter Age or select Date of Birth";
+      newErrors.dob = "Enter Age or select Date of Birth";
+    }
+
+    // If age is entered, validate it
+    if (formData.age && Number(formData.age) < 1) {
       newErrors.age = "Enter a valid age";
+    }
+
 
     if (!formData.bloodGroup)
       newErrors.bloodGroup = "Please select blood group";
@@ -213,9 +221,8 @@ export default function MemberRegister() {
 
         <form
           onSubmit={handleSubmit}
-          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${
-            loading ? "pointer-events-none opacity-70" : ""
-          }`}
+          className={`max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-8 ${loading ? "pointer-events-none opacity-70" : ""
+            }`}
         >
           {/* ================= PERSONAL DETAILS ================= */}
           <div className="space-y-5">
@@ -397,6 +404,10 @@ export default function MemberRegister() {
                   onChange={handleChange}
                   className={inputClass("dob")}
                 />
+                {errors.dob && (
+                  <p className="text-red-500 text-xs">{errors.dob}</p>
+                )}
+
               </div>
 
               <div>
@@ -508,20 +519,20 @@ export default function MemberRegister() {
                 </div>
               </div>
 
-            
+
 
 
               {/* QR */}
               <div className="flex flex-col items-center gap-3">
                 {/* QR Thumbnail */}
-                 <button
-    type="button"
-    onClick={payViaUPI}
-    className="flex items-center justify-center shadow-black gap-2 px-3 py-1 text-xs sm:text-sm font-semibold  rounded-lg bg-gray-300 text-black border hover:shadow-lg hover:bg-gray-300  transition"
-  >
-    <img src={UpiIcon} alt="UPI" className="w-8 h-4 sm:w-8 sm:h-4" />
-    Pay via UPI
-  </button>
+                <button
+                  type="button"
+                  onClick={payViaUPI}
+                  className="flex items-center justify-center shadow-black gap-2 px-3 py-1 text-xs sm:text-sm font-semibold  rounded-lg bg-gray-300 text-black border hover:shadow-lg hover:bg-gray-300  transition"
+                >
+                  <img src={UpiIcon} alt="UPI" className="w-8 h-4 sm:w-8 sm:h-4" />
+                  Pay via UPI
+                </button>
                 <div className="relative w-36">
                   <img
                     src={Qr}
@@ -538,7 +549,7 @@ export default function MemberRegister() {
                   </button>
                 </div>
 
-                
+
 
 
                 {/* Fullscreen Modal */}
