@@ -150,19 +150,16 @@ _Thank you for becoming a member of Kingstar Arts & Sports Club._
 
   } else if (user.membershipStatus === "rejected") {
     // 🔴 REJECTED MESSAGE
-    message = `Hello ${user.name}, Welcome to Kingstar Arts & Sports Club.
+    message = `Hello ${user.name}, 
+Your membership request with Kingstar Eriyapady has been *rejected* due to _______.
 
-❌ We regret to inform you that your membership application has been *rejected*.
+For further clarification, please contact the Secretary at:
+📞 91 9747656653 (Sabit)
 
-_________________
+_Thank you for your interest in Kingstar Arts & Sports Club._
 
-Member Details:
-• Full Name: ${user.name}
-• Display / Nick Name: ${user.nickname || "—"}
-• Father’s Name: ${user.fatherName || "—"}
-• Place: ${user.address || "—"}
-• Blood Group: ${user.bloodGroup || "—"}
-
+---------------------------------
+_Kingstareriyapady.club_ | https://www.instagram.com/kingstar.club/
 _________________
 
 For further clarification, please contact:
