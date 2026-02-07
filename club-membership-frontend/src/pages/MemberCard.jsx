@@ -134,13 +134,7 @@ const MembershipCard = ({ user: propUser }) => {
      Download Membership
   </button>
 
-  {/* Share Button */}
-  <button
-  onClick={handleShareCard}
-  className="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition"
->
-  Share 
-</button>
+
 
 
 </div>

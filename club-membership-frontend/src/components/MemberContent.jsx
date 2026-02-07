@@ -41,14 +41,14 @@ export default function MembershipCard({ user }) {
       <img src={Hashtag} alt="hashtag" className="absolute top-[60px] left-[120px] w-30" />
 
       {/* Profile Image */}
-      <div className="absolute top-[42px] left-10 w-19 h-19 rounded-full border-[4px] border-blue-600 overflow-hidden bg-white">
+      <div className="absolute top-[42px] left-10 w-19 h-19 rounded-full border-[4px] profile-border overflow-hidden bg-white">
         <img src={user.photo} alt="profile" className="w-full h-full object-cover" />
       </div>
 
       {/* Name & ID */}
       <div className="absolute top-[80px] left-[126px]  uppercase">
-        <p className=" font-bold text-yellow-600 toUpperCase() text-[13px]">{user.nickname}</p>
-        <p className=" text-yellow-600 toUpperCase() text-[11px]">{user.membershipId}</p>
+        <p className=" font-bold text-color toUpperCase() text-[13px]">{user.nickname}</p>
+        <p className="text-color toUpperCase() text-[11px]">{user.membershipId}</p>
       </div>
 
       {/* Member Details */}
