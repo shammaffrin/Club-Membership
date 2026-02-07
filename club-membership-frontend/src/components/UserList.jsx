@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaAngleUp } from "react-icons/fa";
+import { FaAngleDown } from "react-icons/fa";
 
 export default function AdminUserList() {
   const STATIC_VALID_UPTO = "31/03/2027";
@@ -425,7 +427,7 @@ function UserCard({
           onClick={() => setExpanded(!expanded)}
           className="px-3 py-1 text-xs bg-indigo-500 text-white rounded"
         >
-          {expanded ? "Collapse" : "Expand"}
+          {expanded ? <FaAngleUp /> : <FaAngleDown />}
         </button>
       </div>
 

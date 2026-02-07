@@ -18,7 +18,7 @@ const MembershipCard = ({ user: propUser }) => {
 
   try {
     const canvas = await html2canvas(componentRef.current, {
-      scale: 2,
+      scale: 4,
       useCORS: true,
       logging: false,
       onclone: (clonedDoc) => {

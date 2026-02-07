@@ -224,7 +224,7 @@ const location = useLocation();
                     }
                     className="px-3 py-1 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition"
                   >
-                    {expandedUser === user._id ? "Collapse" : "Expand"}
+                    {expandedUser === user._id ? <FaAngleUp /> : <FaAngleDown />}
                   </button>
                 </div>
 
