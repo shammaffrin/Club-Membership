@@ -107,13 +107,69 @@ export default function AdminUserList() {
     }
   };
 
-  const getWhatsAppLink = (user) => {
-    const phone = (user.whatsapp || user.phone).replace("+", "");
-    let message = user.membershipStatus === "approved"
-      ? `Hello ${user.name}, your membership has been approved. ID: ${user.membershipId}`
-      : `Hello ${user.name}, your membership has been rejected.`;
-    return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-  };
+const getWhatsAppLink = (user) => {
+  const phone = (user.whatsapp || user.phone).replace("+", "");
+
+  let message = "";
+
+  if (user.membershipStatus === "approved") {
+    // 🟢 APPROVED MESSAGE
+    message = `Hello ${user.name}, Welcome to Kingstar Arts & Sports Club.
+🎉 Your membership has been approved!
+
+Membership ID: *${user.membershipId}*
+Login Mob No.: ${user.phone}
+
+*Download your Membership* 👇
+https://kingstareriyapady.club/dashboard
+
+_________________
+
+Member Details:
+• Full Name: ${user.name}
+• Display / Nick Name: ${user.nickname || "—"}
+• Father’s Name: ${user.fatherName || "—"}
+• Place: ${user.address || "—"}
+• Blood Group: ${user.bloodGroup || "—"}
+• Valid Upto: 31/03/2027
+
+_Thank you for becoming a member of Kingstar Arts & Sports Club._
+
+------------------------------
+- Sabit Aboobacker (Gen. Sec)
+📞 91 9747656653`;
+
+  } else if (user.membershipStatus === "rejected") {
+    // 🔴 REJECTED MESSAGE
+    message = `Hello ${user.name}, Welcome to Kingstar Arts & Sports Club.
+
+❌ We regret to inform you that your membership application has been *rejected*.
+
+_________________
+
+Member Details:
+• Full Name: ${user.name}
+• Display / Nick Name: ${user.nickname || "—"}
+• Father’s Name: ${user.fatherName || "—"}
+• Place: ${user.address || "—"}
+• Blood Group: ${user.bloodGroup || "—"}
+
+_________________
+
+For further clarification, please contact:
+📞 91 9747656653 (Sabit Aboobacker – Gen. Sec)
+
+_Thank you for your interest in Kingstar Arts & Sports Club._
+
+------------------------------
+Kingstar Arts & Sports Club`;
+  }
+
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+};
+
+
+
 
   if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;

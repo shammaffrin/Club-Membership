@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 
 export default function AdminPage() {
   const STATIC_VALID_UPTO = "31/03/2027";
@@ -10,13 +11,24 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [expandedUser, setExpandedUser] = useState(null);
-
+const location = useLocation();
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
 
   const authHeader = {
     headers: { Authorization: `Bearer ${token}` },
   };
+
+  const handleLogout = () => {
+  const confirmLogout = window.confirm(
+    "Are you sure you want to logout from Admin Panel?"
+  );
+
+  if (!confirmLogout) return;
+
+  localStorage.removeItem("adminToken");
+  navigate("/admin-login");
+};
 
   const fetchUsers = async () => {
     if (!token) {
@@ -43,6 +55,8 @@ export default function AdminPage() {
       setLoading(false);
     }
   };
+
+  
 
   const approveUser = async (id) => {
     try {
@@ -79,10 +93,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    navigate("/admin-login");
-  };
 
   useEffect(() => {
     if (!token) navigate("/admin-login");
@@ -98,6 +108,26 @@ export default function AdminPage() {
     });
   };
 
+  const downloadImage = async (imageUrl, name = "user-photo") => {
+  try {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${name}.jpg`;
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    alert("Failed to download image");
+  }
+};
+
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
       {/* Sidebar */}
@@ -107,26 +137,36 @@ export default function AdminPage() {
         </div>
 
         {/* Mobile Tabs */}
-        <div className="flex md:hidden justify-around mb-3">
-          {["Requests", "Members", "Logout"].map((tab) => {
-            const isActive = (tab === "Requests" && location.pathname === "/admin") ||
-                             (tab === "Members" && location.pathname === "/users");
-            return (
-              <button
-                key={tab}
-                onClick={() => {
-                  if (tab === "Requests") navigate("/admin");
-                  else if (tab === "Members") navigate("/users");
-                  else handleLogout();
-                }}
-                className={`px-3 py-2 rounded-md text-sm font-semibold transition
-                  ${isActive ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
+       <div className="flex md:hidden justify-around mb-3">
+  {["Requests", "Members", "Logout"].map((tab) => {
+    const isActive =
+      (tab === "Requests" && location.pathname === "/admin") ||
+      (tab === "Members" && location.pathname === "/users");
+
+    const isLogout = tab === "Logout";
+
+    return (
+      <button
+        key={tab}
+        onClick={() => {
+          if (tab === "Requests") navigate("/admin");
+          else if (tab === "Members") navigate("/users");
+          else handleLogout();
+        }}
+        className={`px-3 py-2 rounded-md text-sm font-semibold transition
+          ${
+            isLogout
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : isActive
+              ? "bg-indigo-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+      >
+        {tab}
+      </button>
+    );
+  })}
+</div>
 
         {/* Desktop Sidebar */}
         <nav className="hidden md:flex flex-col flex-1 px-2 py-3 gap-2">
@@ -209,6 +249,15 @@ export default function AdminPage() {
                         View Payment Proof
                       </a>
                     )}
+                    {user.photo && (
+  <button
+    onClick={() => downloadImage(user.photo, user.name)}
+    className="col-span-full mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition"
+  >
+    Download User Photo
+  </button>
+)}
+
                   </div>
                 )}
 

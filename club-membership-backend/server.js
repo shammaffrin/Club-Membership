@@ -51,5 +51,10 @@ app.get("/", (req, res) => {
   res.send("✅ Club Membership API running");
 });
 
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`✅ Server running on port ${process.env.PORT || 5000}`);
+});
+
+
 /* Export for Vercel */
 export default app;
