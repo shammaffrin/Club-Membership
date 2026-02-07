@@ -93,17 +93,20 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
 router.put("/reject/:id", adminAuth, async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
-
-    // If user was previously approved, clear approval info safely
-    if (user.membershipStatus === "approved") {
-      user.membershipId = null;          // remove membership ID
-      user.approvedAt = null;            // clear approved date
-      user.expiryDate = null;            // clear expiry
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    user.membershipStatus = "rejected"; // set status to rejected
-    await user.save();
+    // Clear approval-related fields SAFELY
+    user.membershipStatus = "rejected";
+    user.membershipId = undefined;   // ✅ NOT null
+    user.approvedAt = undefined;
+    user.expiryDate = undefined;
+
+    await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
       success: true,
@@ -112,9 +115,13 @@ router.put("/reject/:id", adminAuth, async (req, res) => {
     });
   } catch (error) {
     console.error("Reject user error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 });
+
 
 
 /* =========================

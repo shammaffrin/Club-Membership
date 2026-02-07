@@ -41,10 +41,6 @@ export default function AdminUserList() {
     else fetchUsers();
   }, [token]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    navigate("/admin-login");
-  };
 
   const approveUser = async (id) => {
     if (!window.confirm("Approve this user?")) return;
@@ -76,6 +72,8 @@ export default function AdminUserList() {
     fetchUsers();
   };
 
+  
+
   const openEditModal = (user) => {
     setEditingUser(user);
     setEditForm({
@@ -89,6 +87,17 @@ export default function AdminUserList() {
       gender: user.gender || "",
     });
   };
+
+   const handleLogout = () => {
+  const confirmLogout = window.confirm(
+    "Are you sure you want to logout from Admin Panel?"
+  );
+
+  if (!confirmLogout) return;
+
+  localStorage.removeItem("adminToken");
+  navigate("/admin-login");
+};
 
   const handleSaveChanges = async () => {
     try {
@@ -183,38 +192,48 @@ Kingstar Arts & Sports Club`;
   return (
     <div className="flex min-h-screen flex-col md:flex-row bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white shadow-md md:flex md:flex-col flex-col md:min-h-screen p-3 md:p-0">
+         <aside className="w-full md:w-64 bg-white shadow-md md:flex md:flex-col flex-col md:min-h-screen p-3 md:p-0">
         <div className="text-xl md:text-2xl font-bold text-indigo-600 text-center md:text-center m-3 md:mb-0">
           Admin Panel
         </div>
 
         {/* Mobile Tabs */}
-        <div className="flex md:hidden justify-around mb-3">
-          {["Requests", "Members", "Logout"].map((tab) => {
-            const isActive = (tab === "Requests" && location.pathname === "/admin") ||
-              (tab === "Members" && location.pathname === "/users");
-            return (
-              <button
-                key={tab}
-                onClick={() => {
-                  if (tab === "Requests") navigate("/admin");
-                  else if (tab === "Members") navigate("/users");
-                  else handleLogout();
-                }}
-                className={`px-3 py-2 rounded-md text-sm font-semibold transition
-                  ${isActive ? "bg-indigo-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
+       <div className="flex md:hidden justify-around mb-3">
+  {["Requests", "Members", "Logout"].map((tab) => {
+    const isActive =
+      (tab === "Requests" && location.pathname === "/admin") ||
+      (tab === "Members" && location.pathname === "/users");
+
+    const isLogout = tab === "Logout";
+
+    return (
+      <button
+        key={tab}
+        onClick={() => {
+          if (tab === "Requests") navigate("/admin");
+          else if (tab === "Members") navigate("/users");
+          else handleLogout();
+        }}
+        className={`px-3 py-2 rounded-md text-sm font-semibold transition
+          ${
+            isLogout
+              ? "bg-red-600 text-white hover:bg-red-700"
+              : isActive
+              ? "bg-indigo-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+      >
+        {tab}
+      </button>
+    );
+  })}
+</div>
 
         {/* Desktop Sidebar */}
         <nav className="hidden md:flex flex-col flex-1 px-2 py-3 gap-2">
           <SidebarButton label="Requests" active={location.pathname === "/admin"} onClick={() => navigate("/admin")} color="blue" />
           <SidebarButton label="Members" active={location.pathname === "/users"} onClick={() => navigate("/users")} color="blue" />
-          <SidebarButton label="Logout" active={false} onClick={handleLogout} color="red" />
+          <SidebarButton className="" label="Logout" active={false} onClick={handleLogout} color="red" />
         </nav>
       </aside>
 
@@ -327,14 +346,15 @@ function UserCard({ user, STATIC_VALID_UPTO, approveUser, rejectUser, deleteUser
           <p><b>Place:</b> {user.place || "—"}</p>
 
           <div className="flex gap-2 flex-wrap pt-2">
-            {user.membershipStatus === "approved" && (
-              <button
-                onClick={() => rejectUser(user._id)}
-                className="px-2 py-1 text-xs bg-orange-600 text-white rounded"
-              >
-                Reject
-              </button>
-            )}
+            <button
+  onClick={() => {
+    console.log("Reject clicked", user._id);
+    rejectUser(user._id);
+  }}
+  className="px-2 py-1 text-xs bg-orange-600 text-white rounded"
+>
+  Reject
+</button>
 
             {user.membershipStatus === "rejected" && (
               <button
