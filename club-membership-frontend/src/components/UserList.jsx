@@ -342,29 +342,51 @@ function UserCard({ user, STATIC_VALID_UPTO, approveUser, rejectUser, deleteUser
           <p><b>Address:</b> {user.address || "—"}</p>
           <p><b>Place:</b> {user.place || "—"}</p>
 
-          <div className="flex gap-2 flex-wrap pt-2">
-            <button
-  onClick={() => {
-    console.log("Reject clicked", user._id);
-    rejectUser(user._id);
-  }}
-  className="px-2 py-1 text-xs bg-orange-600 text-white rounded"
->
-  Reject
-</button>
+         <div className="flex gap-2 flex-wrap pt-2">
+  {user.membershipStatus === "approved" ? (
+    <>
+      <button
+        onClick={() => rejectUser(user._id)}
+        className="px-2 py-1 text-xs bg-orange-600 text-white rounded"
+      >
+        Reject
+      </button>
+    </>
+  ) : (
+    <>
+      <button
+        onClick={() => approveUser(user._id)}
+        className="px-2 py-1 text-xs bg-green-600 text-white rounded"
+      >
+        Re-Approve
+      </button>
+    </>
+  )}
 
-            {user.membershipStatus === "rejected" && (
-              <button
-                onClick={() => approveUser(user._id)}
-                className="px-2 py-1 text-xs bg-green-600 text-white rounded"
-              >
-                Re-Approve
-              </button>
-            )}
-            <button onClick={() => openEditModal(user)} className="px-2 py-1 text-xs bg-blue-600 text-white rounded">Edit</button>
-            <button onClick={() => deleteUser(user._id)} className="px-2 py-1 text-xs bg-red-800 text-white rounded">Delete</button>
-            <a href={getWhatsAppLink(user)} target="_blank" className="px-2 py-1 text-xs bg-gray-800 text-white rounded">Share</a>
-          </div>
+  <button
+    onClick={() => openEditModal(user)}
+    className="px-2 py-1 text-xs bg-blue-600 text-white rounded"
+  >
+    Edit
+  </button>
+
+  <button
+    onClick={() => deleteUser(user._id)}
+    className="px-2 py-1 text-xs bg-red-800 text-white rounded"
+  >
+    Delete
+  </button>
+
+  <a
+    href={getWhatsAppLink(user)}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="px-2 py-1 text-xs bg-gray-800 text-white rounded"
+  >
+    Share
+  </a>
+</div>
+
         </div>
       )}
     </div>
