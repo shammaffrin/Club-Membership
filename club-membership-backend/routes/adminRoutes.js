@@ -65,9 +65,18 @@ router.put("/approve/:id", adminAuth, async (req, res) => {
         message: "Profile photo and payment proof are required before approval",
       });
     }
+   // Find last approved user's membership number
+const lastUser = await User.findOne({ membershipId: { $regex: /^K-STAR2026\// } })
+  .sort({ membershipId: -1 });
 
-    // Generate membership ID if not present
-    if (!user.membershipId) user.membershipId = `CLUB-${Date.now()}`;
+const nextNumber = lastUser
+  ? parseInt(lastUser.membershipId.split("/")[1]) + 1
+  : 1;
+
+if (!user.membershipId) {
+  user.membershipId = `K-STAR2026/${String(nextNumber).padStart(4, "0")}`;
+}
+
 
     const approvedAt = new Date();
     const expiryDate = new Date(approvedAt);

@@ -54,37 +54,29 @@ export default function MemberDashboard() {
 
   return (
     <div className="flex min-h-screen">
-      {/* SIDEBAR */}
-<aside className="w-64 bg-white border-r hidden md:flex flex-col justify-between shadow-lg">
-  {/* Top: Admin Panel title */}
-  <div className="p-6 text-2xl font-bold text-indigo-600 text-center tracking-wider">
-    Admin Panel
-  </div>
+{/* SIDEBAR */}
+<aside className="hidden md:block w-64 bg-indigo-500 text-white p-6 shadow-xl">
+  <h2 className="text-2xl font-extrabold tracking-wide mb-10">
+    Member Panel
+  </h2>
 
-  {/* Middle: Tab Selection */}
-  <div className="flex flex-col p-4 gap-3">
-    <button
-      className="w-full text-gray-700 font-medium py-2 rounded-lg hover:bg-indigo-50 transition-all"
-    >
-      Requests
-    </button>
-    <button
-      className="w-full text-gray-700 font-medium py-2 rounded-lg hover:bg-indigo-50 transition-all"
-    >
-      Members
-    </button>
-  </div>
+  <nav className="space-y-4">
+    {/* CURRENT PAGE */}
+    <div className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-green-800 font-semibold cursor-default">
+      📊 Dashboard
+    </div>
 
-  {/* Bottom: Logout */}
-  <div className="border-t p-4">
+    {/* LOGOUT */}
     <button
       onClick={handleLogout}
-      className="w-full text-white font-medium bg-red-600 hover:bg-red-700 py-2 rounded-lg transition-all duration-200"
+      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition-all font-semibold"
     >
-      Logout
+      🚪 Logout
     </button>
-  </div>
+  </nav>
 </aside>
+
+
 
 
       {/* MAIN */}
