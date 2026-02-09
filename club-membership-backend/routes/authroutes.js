@@ -5,25 +5,7 @@ import upload from "../middleware/cloudinaryUpload.js";
 const router = express.Router();
 
 /* ======================
-   MEMBERSHIP ID GENERATOR
-====================== */
-const getNextMembershipId = async () => {
-  const lastUser = await User.findOne({
-    membershipId: { $regex: "^K-STAR2026/" },
-  }).sort({ createdAt: -1 });
-
-  let nextNumber = 1;
-
-  if (lastUser?.membershipId) {
-    const lastNumber = parseInt(lastUser.membershipId.split("/")[1], 10);
-    nextNumber = lastNumber + 1;
-  }
-
-  return `K-STAR2026/${String(nextNumber).padStart(4, "0")}`;
-};
-
-/* ======================
-   REGISTER
+   REGISTER (NO MEMBERSHIP ID HERE)
 ====================== */
 router.post(
   "/register",
@@ -110,10 +92,8 @@ router.post(
         });
       }
 
-      const membershipId = await getNextMembershipId();
-
       /* ======================
-         CREATE USER
+         CREATE USER (NO membershipId)
       ====================== */
       const user = await User.create({
         name,
@@ -128,7 +108,7 @@ router.post(
         address,
         dob: dob || null,
 
-        membershipId,
+        membershipId: null, // ✅ IMPORTANT
         membershipStatus: "pending_approval",
 
         photo: req.files.photo[0].path,
@@ -140,8 +120,7 @@ router.post(
 
       res.status(201).json({
         success: true,
-        message: "Registration successful",
-        membershipId: user.membershipId,
+        message: "Registration successful. Awaiting admin approval.",
       });
     } catch (err) {
       console.error("REGISTER ERROR:", err);

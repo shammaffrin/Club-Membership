@@ -170,7 +170,7 @@ const location = useLocation();
 
         {/* Desktop Sidebar */}
         <nav className="hidden md:flex flex-col flex-1 px-2 py-3 gap-2">
-          <SidebarButton label="Requests" active={location.pathname === "/admin"} onClick={() => navigate("/admin")} color="blue" />
+          <SidebarButton label="Requests" active={location.pathname === "/admin"}  count={users.length}  loading={loading} onClick={() => navigate("/admin")} color="blue" />
           <SidebarButton label="Members" active={location.pathname === "/users"} onClick={() => navigate("/users")} color="blue" />
           <SidebarButton className="" label="Logout" active={false} onClick={handleLogout} color="red" />
         </nav>
@@ -330,9 +330,10 @@ function Detail({ label, value }) {
   );
 }
 
-function SidebarButton({ label, icon, active, onClick, color }) {
-  const baseClasses = "w-full flex items-center px-4 py-2 rounded-lg transition font-medium";
-  
+function SidebarButton({ label, active, onClick, color, count=0 ,loading }) {
+  const baseClasses =
+    "w-full flex items-center justify-between px-4 py-2 rounded-lg transition font-medium";
+
   let buttonClasses = "";
   if (color === "red") {
     buttonClasses = "bg-red-600 text-white hover:bg-red-700";
@@ -344,8 +345,15 @@ function SidebarButton({ label, icon, active, onClick, color }) {
 
   return (
     <button onClick={onClick} className={`${baseClasses} ${buttonClasses}`}>
-      {icon && <span className="mr-2">{icon}</span>}
       <span>{label}</span>
+
+      {/* ROUND COUNT */}
+      {!loading && (
+  <span className="w-6 h-6 flex items-center justify-center rounded-full bg-indigo-600 text-white text-xs font-bold">
+    {count}
+  </span>
+
+)}
     </button>
   );
 }
