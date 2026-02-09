@@ -110,9 +110,10 @@ whatsapp: {
     },
 
     membershipId: {
-      type: String,
-      unique: true,
-      required: true,
+  type: String,
+  unique: true,
+  sparse: true,   // ✅ VERY IMPORTANT
+  default: null,
     },
      place: { 
       type: String, 
