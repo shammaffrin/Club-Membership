@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import { FaAngleDown, FaAngleUp } from "react-icons/fa";
+import AdminSidebar from "../components/AdminSidebar"; // adjust path if needed
 
 export default function AdminPage() {
   const STATIC_VALID_UPTO = "31/03/2027";
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0);
+const [membersCount, setMembersCount] = useState(0); // if fetched elsewhere
   const [actionLoading, setActionLoading] = useState(null);
   const [error, setError] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [expandedUser, setExpandedUser] = useState(null);
-const location = useLocation();
   const navigate = useNavigate();
   const token = localStorage.getItem("adminToken");
 
@@ -19,42 +21,40 @@ const location = useLocation();
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  const handleLogout = () => {
-  const confirmLogout = window.confirm(
-    "Are you sure you want to logout from Admin Panel?"
-  );
+  const fetchUsers = async () => {
+  if (!token) {
+    navigate("/admin-login");
+    return;
+  }
+  try {
+    setLoading(true);
+    setError("");
+    const res = await axios.get(
+      "https://club-membership.vercel.app/api/admin/pending-users",
+      authHeader
+    );
+    const fetchedUsers = res.data.users || [];
+    setUsers(fetchedUsers);
 
-  if (!confirmLogout) return;
-
-  localStorage.removeItem("adminToken");
-  navigate("/admin-login");
+    // Compute pendingCount
+    setPendingCount(fetchedUsers.length);
+  } catch (err) {
+    console.error(err);
+    if (err.response?.status === 401 || err.response?.status === 403) {
+      localStorage.removeItem("adminToken");
+      navigate("/admin-login");
+    } else {
+      setError(err.response?.data?.message || "Error fetching users");
+    }
+  } finally {
+    setLoading(false);
+  }
 };
 
-  const fetchUsers = async () => {
-    if (!token) {
-      navigate("/admin-login");
-      return;
-    }
-    try {
-      setLoading(true);
-      setError("");
-      const res = await axios.get(
-        "https://club-membership.vercel.app/api/admin/pending-users",
-        authHeader
-      );
-      setUsers(res.data.users || []);
-    } catch (err) {
-      console.error(err);
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        localStorage.removeItem("adminToken");
-        navigate("/admin-login");
-      } else {
-        setError(err.response?.data?.message || "Error fetching users");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleLogout = () => {
+  localStorage.removeItem("adminToken"); // remove token
+  navigate("/admin-login"); // redirect to login page
+};
 
   
 
@@ -130,53 +130,7 @@ const location = useLocation();
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white shadow-md md:flex md:flex-col flex-col md:min-h-screen p-3 md:p-0">
-        <div className="text-xl md:text-2xl font-bold text-indigo-600 text-center md:text-center m-3 md:mb-0">
-          Admin Panel
-        </div>
 
-        {/* Mobile Tabs */}
-       <div className="flex md:hidden justify-around mb-3">
-  {["Requests", "Members", "Logout"].map((tab) => {
-    const isActive =
-      (tab === "Requests" && location.pathname === "/admin") ||
-      (tab === "Members" && location.pathname === "/users");
-
-    const isLogout = tab === "Logout";
-
-    return (
-      <button
-        key={tab}
-        onClick={() => {
-          if (tab === "Requests") navigate("/admin");
-          else if (tab === "Members") navigate("/users");
-          else handleLogout();
-        }}
-        className={`px-3 py-2 rounded-md text-sm font-semibold transition
-          ${
-            isLogout
-              ? "bg-red-600 text-white hover:bg-red-700"
-              : isActive
-              ? "bg-indigo-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
-      >
-        {tab}
-      </button>
-    );
-  })}
-</div>
-
-        {/* Desktop Sidebar */}
-        <nav className="hidden md:flex flex-col flex-1 px-2 py-3 gap-2">
-          <SidebarButton label="Requests" active={location.pathname === "/admin"}  count={users.length}  loading={loading} onClick={() => navigate("/admin")} color="blue" />
-          <SidebarButton label="Members" active={location.pathname === "/users"} onClick={() => navigate("/users")} color="blue" />
-          <SidebarButton className="" label="Logout" active={false} onClick={handleLogout} color="red" />
-        </nav>
-      </aside>
-
-      
       
 
       {/* Main Content */}
@@ -330,10 +284,9 @@ function Detail({ label, value }) {
   );
 }
 
-function SidebarButton({ label, active, onClick, color, count=0 ,loading }) {
-  const baseClasses =
-    "w-full flex items-center justify-between px-4 py-2 rounded-lg transition font-medium";
-
+function SidebarButton({ label, icon, active, onClick, color }) {
+  const baseClasses = "w-full flex items-center px-4 py-2 rounded-lg transition font-medium";
+  
   let buttonClasses = "";
   if (color === "red") {
     buttonClasses = "bg-red-600 text-white hover:bg-red-700";
@@ -345,15 +298,8 @@ function SidebarButton({ label, active, onClick, color, count=0 ,loading }) {
 
   return (
     <button onClick={onClick} className={`${baseClasses} ${buttonClasses}`}>
+      {icon && <span className="mr-2">{icon}</span>}
       <span>{label}</span>
-
-      {/* ROUND COUNT */}
-      {!loading && (
-  <span className="w-6 h-6 flex items-center justify-center rounded-full bg-indigo-600 text-white text-xs font-bold">
-    {count}
-  </span>
-
-)}
     </button>
   );
 }

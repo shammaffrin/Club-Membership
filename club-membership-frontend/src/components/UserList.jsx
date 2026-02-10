@@ -15,7 +15,6 @@ export default function AdminUserList() {
   const [filter, setFilter] = useState("all");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
   const token = localStorage.getItem("adminToken");
 
   const fetchUsers = async () => {
@@ -84,17 +83,6 @@ export default function AdminUserList() {
       place: user.place || "",
       gender: user.gender || "",
     });
-  };
-
-  const handleLogout = () => {
-    const confirmLogout = window.confirm(
-      "Are you sure you want to logout from Admin Panel?",
-    );
-
-    if (!confirmLogout) return;
-
-    localStorage.removeItem("adminToken");
-    navigate("/admin-login");
   };
 
   const handleSaveChanges = async () => {
@@ -192,68 +180,8 @@ Kingstar Arts & Sports Club`;
         : rejectedUsers;
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row bg-gray-100">
+    <>
       {/* Sidebar */}
-      <aside className="w-full md:w-64 bg-white shadow-md md:flex md:flex-col flex-col md:min-h-screen p-3 md:p-0">
-        <div className="text-xl md:text-2xl font-bold text-indigo-600 text-center md:text-center m-3 md:mb-0">
-          Admin Panel
-        </div>
-
-        {/* Mobile Tabs */}
-        <div className="flex md:hidden justify-around mb-3">
-          {["Requests", "Members", "Logout"].map((tab) => {
-            const isActive =
-              (tab === "Requests" && location.pathname === "/admin") ||
-              (tab === "Members" && location.pathname === "/users");
-
-            const isLogout = tab === "Logout";
-
-            return (
-              <button
-                key={tab}
-                onClick={() => {
-                  if (tab === "Requests") navigate("/admin");
-                  else if (tab === "Members") navigate("/users");
-                  else handleLogout();
-                }}
-                className={`px-3 py-2 rounded-md text-sm font-semibold transition
-          ${
-            isLogout
-              ? "bg-red-600 text-white hover:bg-red-700"
-              : isActive
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Desktop Sidebar */}
-        <nav className="hidden md:flex flex-col flex-1 px-2 py-3 gap-2">
-          <SidebarButton
-            label="Requests"
-            active={location.pathname === "/admin"}
-            onClick={() => navigate("/admin")}
-            color="blue"
-          />
-          <SidebarButton
-            label="Members"
-            active={location.pathname === "/users"}
-            onClick={() => navigate("/users")}
-            color="blue"
-          />
-          <SidebarButton
-            className=""
-            label="Logout"
-            active={false}
-            onClick={handleLogout}
-            color="red"
-          />
-        </nav>
-      </aside>
 
       {/* MAIN */}
       <main className="flex-1 p-3 sm:p-4 md:p-6">
@@ -262,17 +190,27 @@ Kingstar Arts & Sports Club`;
         </h1>
 
         {/* Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
-          {["all", "approved", "rejected"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-lg text-sm sm:text-base ${filter === f ? "bg-gray-800 text-white" : "bg-white border"}`}
-            >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
-        </div>
+<div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
+  {["all", "approved", "rejected"].map((f) => {
+    let count = 0;
+    if (f === "all") count = approvedUsers.length + rejectedUsers.length;
+    if (f === "approved") count = approvedUsers.length;
+    if (f === "rejected") count = rejectedUsers.length;
+
+    return (
+      <button
+        key={f}
+        onClick={() => setFilter(f)}
+        className={`px-4 py-2 rounded-lg text-sm sm:text-base ${
+          filter === f ? "bg-gray-800 text-white" : "bg-white border"
+        }`}
+      >
+        {f.charAt(0).toUpperCase() + f.slice(1)} ({count})
+      </button>
+    );
+  })}
+</div>
+
 
         {/* Users Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 gap-4">
@@ -373,35 +311,12 @@ Kingstar Arts & Sports Club`;
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-/* COMPONENTS */
-function SidebarButton({ label, icon, active, onClick, color }) {
-  const baseClasses =
-    "w-full flex items-center px-4 py-2 rounded-lg transition font-medium";
-
-  let buttonClasses = "";
-  if (color === "red") {
-    buttonClasses = "bg-red-600 text-white hover:bg-red-700";
-  } else if (active) {
-    buttonClasses = "bg-blue-600 text-white";
-  } else {
-    buttonClasses = "hover:bg-gray-100 text-gray-700";
-  }
-
-  return (
-    <button onClick={onClick} className={`${baseClasses} ${buttonClasses}`}>
-      {icon && <span className="mr-2">{icon}</span>}
-      <span>{label}</span>
-    </button>
+    </>
   );
 }
 
 function UserCard({
   user,
-  STATIC_VALID_UPTO,
   approveUser,
   rejectUser,
   deleteUser,
@@ -413,16 +328,25 @@ function UserCard({
     <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition p-4 w-full flex flex-col">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <img
-            src={user.photo || "/default-user.png"}
-            alt={user.name}
-            className="w-20 h-20 rounded-full object-cover border"
-          />
-          <div>
-            <p className="font-semibold text-lg">{user.name}</p>
-            <p className="text-xs text-gray-600">ID: {user.membershipId}</p>
-          </div>
-        </div>
+  <img
+    src={user.photo || "/default-user.png"}
+    alt={user.name}
+    className="w-20 h-20 rounded-full object-cover border"
+  />
+  <div className="flex flex-col">
+    <p className="font-semibold text-lg">{user.name}</p>
+    <p className="text-xs text-gray-600">ID: {user.membershipId}</p>
+    {user.photo && (
+      <a
+        href={user.photo}
+        download={`${user.name}-photo`}
+        className="mt-1 text-xs text-blue-600 hover:underline"
+      >
+        Download Photo
+      </a>
+    )}
+  </div>
+</div>
         <button
           onClick={() => setExpanded(!expanded)}
           className="px-3 py-1 text-xs bg-indigo-500 text-white rounded"
@@ -448,10 +372,7 @@ function UserCard({
           <p>
             <b>Whatsapp:</b> {user.whatsapp || "—"}
           </p>
-          <p>
-            <b>DOB:</b>{" "}
-            {user.dob ? new Date(user.dob).toLocaleDateString() : "—"}
-          </p>
+          <p><b>DOB:</b> {user.dob ? new Date(user.dob).toLocaleDateString() : "—"}</p>
           <p>
             <b>Blood Group:</b> {user.bloodGroup || "—"}
           </p>
@@ -475,10 +396,20 @@ function UserCard({
             ) : (
               <>
                 <button
-                  onClick={() => approveUser(user._id)}
-                  className="px-2 py-1 text-xs bg-green-600 text-white rounded"
+                  onClick={() =>
+                    user.membershipStatus === "approved"
+                      ? rejectUser(user._id)
+                      : approveUser(user._id)
+                  }
+                  className={`px-2 py-1 text-xs text-white rounded ${
+                    user.membershipStatus === "approved"
+                      ? "bg-orange-600"
+                      : "bg-green-600"
+                  }`}
                 >
-                  Re-Approve
+                  {user.membershipStatus === "approved"
+                    ? "Reject"
+                    : "Re-Approve"}
                 </button>
               </>
             )}

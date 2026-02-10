@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import AdminPage from "./components/AdminPage";
+import UserList from "./components/UserList";
+import AdminLayout from "./components/AdminLayout";
+import Login from "./components/Login";
 import MemberRegister from "./components/MemberRegister";
 import UploadPayment from "./components/UpdatePayment";
-import Login from "./components/Login";
-import MemberDashboard from "./components/MembershipDashboard";
-import UserList from "./components/UserList";
 import AdminLogin from "./components/AdminLogin";
+import MemberDashboard from "./components/MembershipDashboard";
 import MembershipCard from "./pages/MemberCard";
-import footer from "./components/Footer"
 import Footer from "./components/Footer";
-// import Footer from "./components/footer";
+
 function App() {
   return (
     <Router>
@@ -21,16 +21,31 @@ function App() {
             <Route path="/upload-payment" element={<UploadPayment />} />
             <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/dashboard" element={<MemberDashboard />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/users" element={<UserList />} />
             <Route path="/member" element={<MembershipCard />} />
-            
+
+            {/* ADMIN ROUTES */}
+            <Route
+              path="/admin"
+              element={
+                <AdminLayout>
+                  <AdminPage />
+                </AdminLayout>
+              }
+            />
+
+            <Route
+              path="/users"
+              element={
+                <AdminLayout>
+                  <UserList />
+                </AdminLayout>
+              }
+            />
           </Routes>
-        
         </div>
-     <Footer />
+
+        <Footer />
       </div>
-      
     </Router>
   );
 }
